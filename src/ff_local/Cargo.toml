@@ -1,0 +1,18 @@
+[package]
+name = "ff_local"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "ff-local"
+path = "main.rs"
+
+[dependencies]
+ff_rt = { path = "../ff_rt" }
+
+bytes = "0.4.12"
+structopt = "0.3.3"
+
+[dependencies.b_error]
+git = "https://github.com/brson/bloop.git"
+rev = "474fc1309eff36a65113000eb6e0dcd9d9e95316"
