@@ -9,6 +9,7 @@ use ckb_vm::{
 use crate::game::Game;
 
 mod game;
+mod transition;
 
 pub fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
     panic!()
