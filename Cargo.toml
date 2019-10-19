@@ -1,5 +1,7 @@
 [workspace]
 members = [
+    "src/ckb_vm_glue",
+    "src/ckb_vm_syscall",
     "src/ff_rt",
     "src/ff_local",
 ]

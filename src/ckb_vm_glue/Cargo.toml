@@ -1,0 +1,10 @@
+[package]
+name = "ckb_vm_glue"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+ckb_vm_syscall = { path = "../ckb_vm_syscall" }
