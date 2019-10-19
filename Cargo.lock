@@ -118,6 +118,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "example_bot"
+version = "0.1.0"
+dependencies = [
+ "ckb_vm_glue 0.1.0",
+ "ckb_vm_syscall 0.1.0",
+]
+
+[[package]]
 name = "ff_local"
 version = "0.1.0"
 dependencies = [

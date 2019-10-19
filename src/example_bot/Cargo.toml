@@ -1,0 +1,12 @@
+[package]
+name = "example_bot"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "ff-example-bot"
+path = "main.rs"
+
+[dependencies]
+ckb_vm_glue = { path = "../ckb_vm_glue" }
+ckb_vm_syscall = { path = "../ckb_vm_syscall" }
