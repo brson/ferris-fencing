@@ -6,6 +6,7 @@ use std::fs::File;
 use b_error::{BResult, ResultExt};
 use std::path::{PathBuf, Path};
 use structopt::StructOpt;
+use ff_rt::game::Match;
 
 #[derive(StructOpt)]
 struct Opts {
@@ -25,6 +26,10 @@ fn run() -> BResult<()> {
     let p2exe = load_file(&opts.p2exe)
         .ec("loading player 2 exe")?;
 
+    let match_res = ff_rt::run_match(&p1exe, &p2exe)?;
+
+    print_match_results(&match_res);
+
     Ok(())
 }
 
@@ -34,4 +39,7 @@ fn load_file(path: &Path) -> BResult<Bytes> {
     file.read_to_end(&mut buffer).e()?;
     let buffer = Bytes::from(buffer);
     Ok(buffer)
+}
+
+fn print_match_results(match_res: &Match) {
 }

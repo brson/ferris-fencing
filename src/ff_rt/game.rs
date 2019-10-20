@@ -3,12 +3,12 @@ pub const STARTING_ENERGY: i32 = 10000;
 pub const GAMES_PER_MATCH: usize = 5;
 
 pub struct Match {
-    games: Vec<Game>,
+    pub games: Vec<Game>,
 }
 
 pub struct Game {
-    turns: Vec<Turn>,
-    end: EndState,
+    pub turns: Vec<Turn>,
+    pub end: EndState,
 }
 
 pub struct Turn {
@@ -18,14 +18,14 @@ pub struct Turn {
 
 #[derive(Copy, Clone)]
 pub struct ActiveState {
-    p1: PlayerState,
-    p2: PlayerState,
+    pub p1: PlayerState,
+    pub p2: PlayerState,
 }
 
 #[derive(Copy, Clone)]
 pub struct PlayerState {
-    pos: i32,
-    energy: i32,
+    pub pos: i32,
+    pub energy: i32,
 }
 
 pub enum EndState {

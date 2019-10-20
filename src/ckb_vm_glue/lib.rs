@@ -61,10 +61,14 @@ impl Termination for () {
     fn report(self) -> i32 { 0 }
 }
 
-// HACK: Unlike seemingly every other architecture, it seems that there must be
-// a _start function to act is the entry point on RISC-V? This one immediately
+// HACK: Unlike seemingly every other architecture, it seems we must define
+// a _start function to act is the entry point on RISC-V. This one immediately
 // calls the main function emitted by rustc, the function rustc things is the
-// application entry point. I don't really understand what's going on here.
+// application entry point. I don't really understand what's going on here. It
+// must normally be provided by some system startup object not provided by
+// rustc.
+//
+// FIXME: Probably need to use assembly here to access the program arguments
 #[no_mangle]
 pub fn _start(argc: i32, argv: *const *const u8) -> i32 {
     extern "C" {

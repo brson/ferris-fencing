@@ -8,3 +8,4 @@ path = "lib.rs"
 
 [dependencies]
 ckb_vm_syscall = { path = "../ckb_vm_syscall" }
+compiler_builtins = { version = "0.1.16" }

@@ -1,32 +1,131 @@
 #![allow(unused)]
 
+use std::rc::Rc;
+use std::cell::RefCell;
 use bytes::Bytes;
 use b_error::{BResult, ResultExt};
 use ckb_vm::{
     SparseMemory, Register, Memory, TraceMachine, DefaultCoreMachine,
-    WXorXMemory, DefaultMachineBuilder,
+    WXorXMemory, DefaultMachineBuilder, DefaultMachine, SupportMachine,
 };
-use crate::game::Game;
+use ckb_vm::decoder::{build_imac_decoder, Decoder};
+use ckb_vm::Error as CkbError;
+use ckb_vm::Syscalls;
+use crate::game::{Match, Game};
+use crate::game::GAMES_PER_MATCH;
 
-mod game;
+pub mod game;
 mod transition;
 
-pub fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
-    panic!()
-}    
+pub fn run_match(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Match> {
 
-fn run_vm(program: &Bytes, args: &[Bytes]) -> BResult<i8> {
-    run_vm_mem::<u32, SparseMemory<u32>>(program, args)
+    let mut games = vec![];
+    for _ in 0..GAMES_PER_MATCH {
+        let game = run_game(p1exe, p2exe)?;
+        games.push(game);
+    }
+
+    Ok(Match { games })
 }
 
-fn run_vm_mem<R: Register, M: Memory<R> + Default>(
-    program: &Bytes,
-    args: &[Bytes],
-) -> BResult<i8> {
-    let core_machine = DefaultCoreMachine::<R, WXorXMemory<R, M>>::default();
+fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
+    let game_state = Rc::new(RefCell::new(GameState {
+        p1wait: false,
+        p2wait: false,
+    }));
+
+    let p1syscalls = GameSyscalls {
+        player: Player::P1,
+        game_state: game_state.clone(),
+    };
+    let p2syscalls = GameSyscalls {
+        player: Player::P2,
+        game_state: game_state.clone(),
+    };
+    
+    let mut p1m = make_vm(p1syscalls)?;
+    let mut p2m = make_vm(p2syscalls)?;
+
+    p1m.load_program(p1exe, &[]).e()?; // TODO
+    p2m.load_program(p2exe, &[]).e()?; // TODO
+
+    let decoder = build_imac_decoder::<u32>();
+
+    loop {
+        assert!(p1m.running() == p2m.running());
+        if !p1m.running() { break; }
+
+        if !game_state.borrow().p1wait {
+            p1m.step(&decoder).e()?; // TODO
+        }
+        if !game_state.borrow().p2wait {
+            p2m.step(&decoder).e()?; // TODO
+        }
+        game_state.borrow_mut().evaluate();
+    }
+
+    let r = game_state.borrow().to_game_result();
+    Ok(r)
+}    
+
+struct GameState {
+    pub p1wait: bool,
+    pub p2wait: bool,
+}
+
+impl GameState {
+    fn evaluate(&mut self) {
+    }
+
+    fn to_game_result(&self) -> Game {
+        use game::*;
+        Game {
+            turns: vec![],
+            end: EndState::EnergyTie(ActiveState {
+                p1: PlayerState {
+                    pos: 0, energy: 0,
+                },
+                p2: PlayerState {
+                    pos: 0, energy: 0,
+                },
+            }),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq)]
+enum Player { P1, P2 }
+
+struct GameSyscalls {
+    player: Player,
+    game_state: Rc<RefCell<GameState>>,
+}
+
+impl<Mac: SupportMachine> Syscalls<Mac> for GameSyscalls {
+    fn initialize(&mut self, machine: &mut Mac) -> Result<(), CkbError> { Ok(()) }
+
+    fn ecall(&mut self, machine: &mut Mac) -> Result<bool, CkbError> {
+        Ok(false)
+    }
+}
+
+fn e_state(game_state: &GameState,
+           p1_pos: &mut i32, p2_pos: &mut i32,
+           p1_energy: &mut i32, p2_energy: &mut i32) -> i32 {
+    0
+}
+
+fn e_move(game_state: &mut GameState,
+          move_kind: &mut i32) -> i32 {
+    0
+}           
+
+type Machine<'a> = DefaultMachine<'a, DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32>>>>;
+
+fn make_vm<'a>(sys: GameSyscalls) -> BResult<Machine<'a>> {
+    let core_machine = DefaultCoreMachine::default();
     let builder = DefaultMachineBuilder::new(core_machine);
+    let builder = builder.syscall(Box::new(sys));
     let machine = builder.build();
-    let mut machine = TraceMachine::new(machine);
-    machine.load_program(program, args).e()?;
-    Ok(machine.run().e()?)
+    Ok(machine)
 }
