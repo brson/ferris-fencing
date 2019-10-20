@@ -11,6 +11,7 @@ use ckb_vm::{
 use ckb_vm::decoder::{build_imac_decoder, Decoder};
 use ckb_vm::Error as CkbError;
 use ckb_vm::Syscalls;
+use ckb_vm::CoreMachine;
 use crate::game::{Match, Game};
 use crate::game::GAMES_PER_MATCH;
 
@@ -49,8 +50,12 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
     p1m.load_program(p1exe, &[]).e()?; // TODO
     p2m.load_program(p2exe, &[]).e()?; // TODO
 
+    p1m.set_running(true);
+    p2m.set_running(true);
+
     let decoder = build_imac_decoder::<u32>();
 
+    println!("running");
     loop {
         assert!(p1m.running() == p2m.running());
         if !p1m.running() { break; }
@@ -63,6 +68,7 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
         }
         game_state.borrow_mut().evaluate();
     }
+    println!("ending");
 
     let r = game_state.borrow().to_game_result();
     Ok(r)
@@ -101,13 +107,31 @@ struct GameSyscalls {
     game_state: Rc<RefCell<GameState>>,
 }
 
-impl<Mac: SupportMachine> Syscalls<Mac> for GameSyscalls {
-    fn initialize(&mut self, machine: &mut Mac) -> Result<(), CkbError> { Ok(()) }
+impl Syscalls<GameCoreMachine> for GameSyscalls {
+    fn initialize(&mut self, machine: &mut GameCoreMachine) -> Result<(), CkbError> { Ok(()) }
 
-    fn ecall(&mut self, machine: &mut Mac) -> Result<bool, CkbError> {
-        Ok(false)
+    fn ecall(&mut self, machine: &mut GameCoreMachine) -> Result<bool, CkbError> {
+        use ckb_vm::registers::*;
+
+        let num = machine.registers()[A7];
+        match num as u32 {
+            ECALL_STATE => {
+                println!("ecall state");
+                machine.set_running(false);
+                Ok(true)
+            },
+            ECALL_MOVE => {
+                println!("ecall move");
+                machine.set_running(false);
+                Ok(true)
+            },
+            _ => Ok(false),
+        }
     }
 }
+
+const ECALL_STATE: u32 = 0x0100;
+const ECALL_MOVE: u32 =  0x0101;
 
 fn e_state(game_state: &GameState,
            p1_pos: &mut i32, p2_pos: &mut i32,
@@ -116,13 +140,14 @@ fn e_state(game_state: &GameState,
 }
 
 fn e_move(game_state: &mut GameState,
-          move_kind: &mut i32) -> i32 {
+          move_kind: i32) -> i32 {
     0
 }           
 
-type Machine<'a> = DefaultMachine<'a, DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32>>>>;
+type GameCoreMachine = DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32>>>;
+type GameMachine<'a> = DefaultMachine<'a, GameCoreMachine>;
 
-fn make_vm<'a>(sys: GameSyscalls) -> BResult<Machine<'a>> {
+fn make_vm<'a>(sys: GameSyscalls) -> BResult<GameMachine<'a>> {
     let core_machine = DefaultCoreMachine::default();
     let builder = DefaultMachineBuilder::new(core_machine);
     let builder = builder.syscall(Box::new(sys));
