@@ -3,6 +3,7 @@ pub const P1_START_POS: i32 = 1;
 pub const P2_START_POS: i32 = 10;
 pub const START_ENERGY: i32 = 10000;
 pub const GAMES_PER_MATCH: usize = 5;
+pub const MAX_TURNS: i32 = 20;
 
 pub struct Match {
     pub games: Vec<Game>,
@@ -43,6 +44,7 @@ pub enum EndState {
     P1Energy(ActiveState),
     P2Energy(ActiveState),
     EnergyTie(ActiveState),
+    TurnTie(ActiveState),
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -111,7 +113,7 @@ impl ActiveState {
         ds
     }
 
-    pub fn make_move(self, moves: MovePair) -> (Turn, NextGameState) {
+    pub fn make_move(self, moves: MovePair, turn_no: i32) -> (Turn, NextGameState) {
         use crate::transition::{self, WallOrientation, Separation, Transition};
         use WallOrientation::*;
         use MoveKind::*;
@@ -139,6 +141,10 @@ impl ActiveState {
             state: self,
             moves
         };
+
+        if turn_no == MAX_TURNS {
+            return (turn, End(EndState::TurnTie(self)));
+        }
 
         let nm = self.naive_moves(moves);
         let bouncem = ActiveState {
@@ -267,6 +273,7 @@ impl EndState {
             P1Energy(ref s) => s,
             P2Energy(ref s) => s,
             EnergyTie(ref s) => s,
+            TurnTie(ref s) => s,
         };
 
         assert!(s.p1.pos >= 0);
@@ -293,6 +300,7 @@ impl EndState {
             P1Energy(s) => s,
             P2Energy(s) => s,
             EnergyTie(s) => s,
+            TurnTie(s) => s,
         }
     }
 }

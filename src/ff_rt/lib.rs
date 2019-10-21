@@ -84,9 +84,8 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
         }
         if game_state.borrow().ready_for_turn() {
             println!("turn {}", turn_no);
-            game_state.borrow_mut().evaluate(&mut p1m, &mut p2m);
+            game_state.borrow_mut().evaluate(&mut p1m, &mut p2m, turn_no);
             turn_no += 1;
-            //if turn_no == 5 { break; }
         }
     }
     println!("ending");
@@ -130,7 +129,7 @@ impl GameState {
         self.p1next.is_some() && self.p2next.is_some()
     }
     
-    fn evaluate(&mut self, p1m: &mut GameMachine, p2m: &mut GameMachine) {
+    fn evaluate(&mut self, p1m: &mut GameMachine, p2m: &mut GameMachine, turn_no: i32) {
         assert!(self.ready_for_turn());
         let (p1next, p2next) = (self.p1next.expect("p1next"),
                                 self.p2next.expect("p2next"));
@@ -147,7 +146,7 @@ impl GameState {
 
         println!("evaluating next game state");
 
-        let (turn, next_state) = this_state.make_move(move_pair);
+        let (turn, next_state) = this_state.make_move(move_pair, turn_no);
 
         println!("current_state: {:?}", this_state);
         println!("next_state: {:?}", next_state);
