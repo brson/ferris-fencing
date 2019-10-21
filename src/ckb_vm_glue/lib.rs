@@ -5,7 +5,8 @@ use ckb_vm_syscall as syscall;
 
 pub const ECALL_EXIT: usize = 93;
 
-const ABORT_EXIT_CODE: i32 = 102;
+const PANIC_EXIT_CODE: i32 = 102;
+const ABORT_EXIT_CODE: i32 = 103;
 
 pub fn exit(code: i32) -> ! {
     unsafe { syscall::ecall1(ECALL_EXIT, code as usize) };
@@ -16,7 +17,7 @@ use core::panic::PanicInfo;
 
 #[panic_handler]
 fn panic(_: &PanicInfo) -> ! {
-    abort()
+    exit(PANIC_EXIT_CODE)
 }
 
 // HACK: If a linking binary doesn't explicitly reference this crate, then rustc

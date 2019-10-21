@@ -6,14 +6,31 @@ use ckb_vm_syscall::{ecall4, ecall1};
 fn main() {
     ckb_vm_glue::init();
 
+    const MOVE_BACK: i32 = 1;
+    const MOVE_STAND: i32 = 2;
+    const MOVE_FORWARD: i32 = 3;
+    const MOVE_LUNGE: i32 = 4;
+
     loop {
-        let mut p1_pos = 0;
-        let mut p2_pos = 0;
-        let mut p1_energy = 0;
-        let mut p2_energy = 0;
-        e_state(&mut p1_pos, &mut p2_pos,
-                &mut p1_energy, &mut p2_energy);
-        e_move(1);
+        let mut my_pos = 0;
+        let mut other_pos = 0;
+        let mut my_energy = 0;
+        let mut other_energy = 0;
+        let r = e_state(&mut my_pos, &mut other_pos,
+                        &mut my_energy, &mut other_energy);
+        assert!(r == 0);
+
+        assert!(other_pos - my_pos > 0);
+        let sep = other_pos - my_pos - 1;
+        let mut next_move = MOVE_FORWARD;
+        if sep == 1 && my_pos >= 3 {
+            next_move = MOVE_BACK;
+        } else if sep == 2 {
+            next_move = MOVE_LUNGE;
+        }
+
+        let r = e_move(next_move);
+        assert!(r == 0);
     }
 }
 

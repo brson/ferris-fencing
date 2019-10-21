@@ -16,7 +16,7 @@ use ckb_vm::Error as CkbError;
 use ckb_vm::Syscalls;
 use ckb_vm::CoreMachine;
 use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState, EndState, Turn, Player};
-use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
+use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY, GAME_FIELD_SIZE};
 use ckb_vm::registers::*;
 use std::convert::TryFrom;
 use std::mem;
@@ -64,9 +64,6 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
     debug!("running");
     let mut turn_no = 0;
     loop {
-        assert!(p1m.running() == p2m.running());
-        if !p1m.running() { break; }
-
         if game_state.borrow().p1next.is_none() {
             match p1m.step(&decoder) {
                 Err(CkbError::InvalidCycles) => {
@@ -85,10 +82,19 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
                 Ok(_) => { }
             }
         }
+        if !p1m.running() {
+            panic!("p1 stopped: {}", p1m.exit_code());
+        }
+        if !p2m.running() {
+            panic!("p2 stopped: {}", p2m.exit_code());
+        }
         if game_state.borrow().ready_for_turn() {
             debug!("turn {}", turn_no);
             game_state.borrow_mut().evaluate(&mut p1m, &mut p2m, turn_no);
             turn_no += 1;
+            if game_state.borrow().end.is_some() {
+                break;
+            }
         }
     }
     debug!("ending");
@@ -165,8 +171,6 @@ impl GameState {
                 self.p1state = state.inner_state().p1;
                 self.p2state = state.inner_state().p2;
                 self.end = Some(state);
-                p1m.set_running(false);
-                p2m.set_running(false);
             }
         }
 
@@ -278,7 +282,9 @@ fn e_state(machine: &mut GameCoreMachine,
     let mut pb_energy = game_state.p2state.energy as MWord;
 
     if player == Player::P2 {
-        mem::swap(&mut pa_pos, &mut pb_pos);
+        let pa_pos_tmp = pa_pos;
+        pa_pos = GAME_FIELD_SIZE as u32 - 1 - pb_pos;
+        pb_pos = GAME_FIELD_SIZE as u32 - 1 - pa_pos_tmp;
         mem::swap(&mut pa_energy, &mut pb_energy);
     }
 
