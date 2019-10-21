@@ -12,6 +12,9 @@ ff_rt = { path = "../ff_rt" }
 
 bytes = "0.4.12"
 structopt = "0.3.3"
+log = "0.4.8"
+env_logger = "0.7.1"
+itertools = "0.8.0"
 
 [dependencies.b_error]
 git = "https://github.com/brson/bloop.git"

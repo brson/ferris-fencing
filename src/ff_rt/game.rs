@@ -1,7 +1,7 @@
 pub const GAME_FIELD_SIZE: i32 = 12;
 pub const P1_START_POS: i32 = 1;
 pub const P2_START_POS: i32 = 10;
-pub const START_ENERGY: i32 = 10000;
+pub const START_ENERGY: i32 = 15000;
 pub const GAMES_PER_MATCH: usize = 1;
 pub const MAX_TURNS: i32 = 20;
 
@@ -17,8 +17,8 @@ pub struct Game {
 
 #[derive(Copy, Clone, Debug)]
 pub struct Turn {
-    state: ActiveState,
-    moves: MovePair,
+    pub state: ActiveState,
+    pub moves: MovePair,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -74,6 +74,9 @@ pub enum NextGameState {
     End(EndState),
 }
 
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+pub enum Player { P1, P2 }
+
 #[derive(Debug)]
 pub struct DecisionState {
     p1_dist_from_wall: i32,
@@ -107,8 +110,8 @@ impl ActiveState {
             p2_energy: self.p2.energy,
         };
 
-        println!("as: {:?}", self);
-        println!("ds: {:?}", ds);
+        debug!("as: {:?}", self);
+        debug!("ds: {:?}", ds);
 
         ds
     }
@@ -212,7 +215,7 @@ impl ActiveState {
             EndEnergy => energy,
         };
 
-        println!("ngs: {:?}", ngs);
+        debug!("ngs: {:?}", ngs);
 
         ngs.assert();
 
@@ -301,6 +304,57 @@ impl EndState {
             P2Energy(s) => s,
             EnergyTie(s) => s,
             TurnTie(s) => s,
+        }
+    }
+
+    pub fn winner(&self) -> &'static str {
+        use EndState::*;
+
+        match *self {
+            P1Victory(s) => "player-1",
+            P2Victory(s) => "player-2",
+            P1Pin(s) => "player-1",
+            P2Pin(s) => "player-2",
+            P1Survive(s) => "player-1",
+            P2Survive(s) => "player-2",
+            P1Energy(s) => "player-1",
+            P2Energy(s) => "player-2",
+            EnergyTie(s) => "tie",
+            TurnTie(s) => "tie",
+        }
+    }
+
+    pub fn victor(&self) -> Option<Player> {
+        use EndState::*;
+
+        match *self {
+            P1Victory(s) => Some(Player::P1),
+            P2Victory(s) => Some(Player::P2),
+            P1Pin(s) => Some(Player::P1),
+            P2Pin(s) => Some(Player::P2),
+            P1Survive(s) => Some(Player::P1),
+            P2Survive(s) => Some(Player::P2),
+            P1Energy(s) => Some(Player::P1),
+            P2Energy(s) => Some(Player::P2),
+            EnergyTie(s) => None,
+            TurnTie(s) => None,
+        }
+    }
+
+    pub fn explain(&self) -> &'static str {
+        use EndState::*;
+
+        match *self {
+            P1Victory(s) => "victory",
+            P2Victory(s) => "victory",
+            P1Pin(s) => "opponent-pinned",
+            P2Pin(s) => "opponent-pinned",
+            P1Survive(s) => "oponent-out-of-energy",
+            P2Survive(s) => "opponent-out-of-energy",
+            P1Energy(s) => "more-energy",
+            P2Energy(s) => "more-energy",
+            EnergyTie(s) => "out-of-energy",
+            TurnTie(s) => "out-of-turns",
         }
     }
 }

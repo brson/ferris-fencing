@@ -1,12 +1,18 @@
 #![allow(unused)]
 
+#[macro_use]
+extern crate env_logger;
+
 use bytes::Bytes;
 use std::io::Read;
 use std::fs::File;
 use b_error::{BResult, ResultExt};
 use std::path::{PathBuf, Path};
 use structopt::StructOpt;
-use ff_rt::game::Match;
+use ff_rt::game::{Match, ActiveState, MovePair, Player};
+use std::iter;
+use ff_rt::game::{GAME_FIELD_SIZE, EndState};
+use itertools::Itertools;
 
 #[derive(StructOpt)]
 struct Opts {
@@ -19,6 +25,8 @@ fn main() {
 }
 
 fn run() -> BResult<()> {
+    env_logger::init();
+    
     let opts = Opts::from_args();
 
     let p1exe = load_file(&opts.p1exe)
@@ -43,9 +51,99 @@ fn load_file(path: &Path) -> BResult<Bytes> {
 
 fn print_match_results(match_res: &Match) {
     println!();
-    println!("results:");
+    println!("match results:");
     for (i, game) in match_res.games.iter().enumerate() {
-        println!("game 1:");
-        println!("{:?}", game);
+        println!(" game {}", i);
+        for (i, turn) in game.turns.iter().enumerate() {
+            let grid = graphic_grid(&turn.state);
+            let energy = graphic_energy(&turn.state);
+            let moves = graphic_moves(&turn.moves);
+            println!("  turn {:2}: {}", i, grid);
+            //println!("  energy   : {}", energy);
+            //println!("  moves    : {}", moves);
+        }
+        println!();
+        let grid = graphic_end_grid(&game.end);
+        let energy = graphic_energy(&game.end.inner_state());
+        let winner = game.end.winner();
+        let reason = game.end.explain();
+        println!("  end    : {}", grid);
+        //println!("  energy: {}", energy);
+        println!("  winner : {} ({})", winner, reason);
     }
+    println!();
+}
+
+fn graphic_grid(s: &ActiveState) -> String {
+    let s: String = iter::repeat('_')
+        .take(GAME_FIELD_SIZE as usize)
+        .enumerate()
+        .map(|(i, blank)| {
+            if i == s.p1.pos as usize {
+                '1'
+            } else if i == s.p2.pos as usize {
+                '2'
+            } else {
+                blank
+            }
+        })
+        .intersperse('|')
+        .collect();
+
+    format!("|{}|", s)
+}
+
+fn graphic_end_grid(s: &EndState) -> String {
+    let s: String = iter::repeat('_')
+        .take(GAME_FIELD_SIZE as usize)
+        .enumerate()
+        .map(|(i, blank)| {
+            if s.victor() == None {
+                if i == s.inner_state().p1.pos as usize {
+                    '1'
+                } else if i == s.inner_state().p2.pos as usize {
+                    '2'
+                } else {
+                    blank
+                }
+            } else {
+                blank
+            }
+        })
+        .enumerate()
+        .map(|(i, what)| {
+            if s.victor() == Some(Player::P1) {
+                if i == s.inner_state().p2.pos as usize {
+                    '2'
+                } else {
+                    what
+                }
+            } else {
+                what
+            }
+        })
+        .enumerate()
+        .map(|(i, what)| {
+            if s.victor() == Some(Player::P2) {
+                if i == s.inner_state().p1.pos as usize {
+                    '1'
+                } else {
+                    what
+                }
+            } else {
+                what
+            }
+        })
+        .intersperse('|')
+        .collect();
+
+    format!("|{}|", s)
+}
+
+fn graphic_energy(s: &ActiveState) -> String {
+    String::new()
+}
+
+fn graphic_moves(s: &MovePair) -> String {
+    String::new()
 }

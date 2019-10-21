@@ -1,5 +1,8 @@
 #![allow(unused)]
 
+#[macro_use]
+extern crate log;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 use bytes::Bytes;
@@ -12,7 +15,7 @@ use ckb_vm::decoder::{build_imac_decoder, Decoder};
 use ckb_vm::Error as CkbError;
 use ckb_vm::Syscalls;
 use ckb_vm::CoreMachine;
-use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState, EndState, Turn};
+use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState, EndState, Turn, Player};
 use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
 use ckb_vm::registers::*;
 use std::convert::TryFrom;
@@ -58,7 +61,7 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
 
     let decoder = build_imac_decoder::<u32>();
 
-    println!("running");
+    debug!("running");
     let mut turn_no = 0;
     loop {
         assert!(p1m.running() == p2m.running());
@@ -83,12 +86,12 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
             }
         }
         if game_state.borrow().ready_for_turn() {
-            println!("turn {}", turn_no);
+            debug!("turn {}", turn_no);
             game_state.borrow_mut().evaluate(&mut p1m, &mut p2m, turn_no);
             turn_no += 1;
         }
     }
-    println!("ending");
+    debug!("ending");
 
     let r = game_state.borrow().to_game_result();
     Ok(r)
@@ -144,12 +147,12 @@ impl GameState {
             p2: p2next,
         };
 
-        println!("evaluating next game state");
+        debug!("evaluating next game state");
 
         let (turn, next_state) = this_state.make_move(move_pair, turn_no);
 
-        println!("current_state: {:?}", this_state);
-        println!("next_state: {:?}", next_state);
+        debug!("current_state: {:?}", this_state);
+        debug!("next_state: {:?}", next_state);
 
         self.past_turns.push(turn);
 
@@ -172,7 +175,7 @@ impl GameState {
     }
 
     fn no_energy(&mut self, player: Player) {
-        println!("player {:?} ran out of energy", player);
+        debug!("player {:?} ran out of energy", player);
         match player {
             Player::P1 => {
                 self.p1next = Some(Move {
@@ -196,9 +199,6 @@ impl GameState {
         }
     }
 }
-
-#[derive(Eq, PartialEq, Copy, Clone, Debug)]
-enum Player { P1, P2 }
 
 struct GameSyscalls {
     player: Player,
@@ -311,7 +311,7 @@ fn e_move(machine: &mut GameCoreMachine,
 
     const ERR_BAD_MOVE: MWord = 1;
     
-    println!("making move for {:?}: {:?}", player, move_kind);
+    debug!("making move for {:?}: {:?}", player, move_kind);
 
     let move_kind = match move_kind {
         MOVE_BACK => MoveKind::Back,
@@ -321,7 +321,7 @@ fn e_move(machine: &mut GameCoreMachine,
         _ => return ERR_BAD_MOVE,
     };
 
-    println!("making move for {:?}: {:?}", player, move_kind);
+    debug!("making move for {:?}: {:?}", player, move_kind);
 
     let cycles = i32::try_from(machine.cycles()).expect("cycle overflow");
 
