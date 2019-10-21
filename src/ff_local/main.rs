@@ -42,4 +42,10 @@ fn load_file(path: &Path) -> BResult<Bytes> {
 }
 
 fn print_match_results(match_res: &Match) {
+    println!();
+    println!("results:");
+    for (i, game) in match_res.games.iter().enumerate() {
+        println!("game 1:");
+        println!("{:?}", game);
+    }
 }

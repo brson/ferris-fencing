@@ -8,12 +8,13 @@ pub struct Match {
     pub games: Vec<Game>,
 }
 
+#[derive(Debug)]
 pub struct Game {
     pub turns: Vec<Turn>,
     pub end: EndState,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Turn {
     state: ActiveState,
     moves: MovePair,
@@ -44,13 +45,13 @@ pub enum EndState {
     EnergyTie(ActiveState),
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct MovePair {
     pub p1: Move,
     pub p2: Move,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Move {
     pub kind: MoveKind,
     pub energy_spent: i32,
@@ -154,14 +155,18 @@ impl ActiveState {
                 energy: nm.p2.energy,
             },
         };
+        let energym = ActiveState {
+            p1: PlayerState { pos: self.p1.pos, energy: nm.p1.energy },
+            p2: PlayerState { pos: self.p2.pos, energy: nm.p2.energy },
+        };
 
         let anm = Active(nm);
         let bounce = Active(bouncem);
         let wall = Active(clampedm);
         let p1v = End(EndState::P1Victory(nm));
         let p2v = End(EndState::P2Victory(nm));
-        let p1survive = End(EndState::P1Survive(self));
-        let p2survive = End(EndState::P2Survive(self));
+        let p1survive = End(EndState::P1Survive(energym));
+        let p2survive = End(EndState::P2Survive(energym));
         let p1push = Active(ActiveState {
             p1: PlayerState { pos: self.p2.pos, energy: nm.p1.energy },
             p2: PlayerState { pos: self.p2.pos.wrapping_add(1), energy: nm.p2.energy, },
@@ -171,9 +176,9 @@ impl ActiveState {
             p2: PlayerState { pos: self.p1.pos, energy: nm.p2.energy, },
         });
         let energy = End(match nm.p1.energy.cmp(&nm.p2.energy) {
-            Less => EndState::P2Energy(self),
-            Equal => EndState::EnergyTie(self),
-            Greater => EndState::P1Energy(self),
+            Less => EndState::P2Energy(energym),
+            Equal => EndState::EnergyTie(energym),
+            Greater => EndState::P1Energy(energym),
         });
         let p1pin = End(EndState::P1Pin(ActiveState {
             p1: PlayerState { pos: GAME_FIELD_SIZE - 1, energy: nm.p1.energy },

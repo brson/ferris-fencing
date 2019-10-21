@@ -65,10 +65,22 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
         if !p1m.running() { break; }
 
         if game_state.borrow().p1next.is_none() {
-            p1m.step(&decoder).e()?; // TODO
+            match p1m.step(&decoder) {
+                Err(CkbError::InvalidCycles) => {
+                    game_state.borrow_mut().no_energy(Player::P1);
+                },
+                Err(e) => Err(e).e()?,
+                Ok(_) => { }
+            }
         }
         if game_state.borrow().p2next.is_none() {
-            p2m.step(&decoder).e()?; // TODO
+            match p2m.step(&decoder) {
+                Err(CkbError::InvalidCycles) => {
+                    game_state.borrow_mut().no_energy(Player::P2);
+                },
+                Err(e) => Err(e).e()?,
+                Ok(_) => { }
+            }
         }
         if game_state.borrow().ready_for_turn() {
             println!("turn {}", turn_no);
@@ -87,10 +99,10 @@ struct GameState {
     pub past_turns: Vec<Turn>,
     pub p1state: PlayerState,
     pub p2state: PlayerState,
-    pub p1cycles: i32,
-    pub p2cycles: i32,
     pub p1next: Option<Move>,
     pub p2next: Option<Move>,
+    pub p1cycles: i32,
+    pub p2cycles: i32,
     pub end: Option<EndState>,
 }
 
@@ -106,10 +118,10 @@ impl GameState {
                 pos: P2_START_POS,
                 energy: START_ENERGY,
             },
-            p1cycles: 0,
-            p2cycles: 0,
             p1next: None,
             p2next: None,
+            p1cycles: 0,
+            p2cycles: 0,
             end: None,
         }
     }
@@ -158,6 +170,24 @@ impl GameState {
 
         self.p1next = None;
         self.p2next = None;
+    }
+
+    fn no_energy(&mut self, player: Player) {
+        println!("player {:?} ran out of energy", player);
+        match player {
+            Player::P1 => {
+                self.p1next = Some(Move {
+                    kind: MoveKind::NoEnergy,
+                    energy_spent: self.p1state.energy,
+                });
+            },
+            Player::P2 => {
+                self.p2next = Some(Move {
+                    kind: MoveKind::NoEnergy,
+                    energy_spent: self.p2state.energy,
+                });
+            },
+        }
     }
 
     fn to_game_result(&self) -> Game {
