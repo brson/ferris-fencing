@@ -16,6 +16,7 @@ use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameSt
 use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
 use ckb_vm::registers::*;
 use std::convert::TryFrom;
+use std::mem;
 
 pub mod game;
 mod transition;
@@ -27,7 +28,6 @@ pub fn run_match(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Match> {
     for _ in 0..GAMES_PER_MATCH {
         let game = run_game(p1exe, p2exe)?;
         games.push(game);
-        break;
     }
 
     Ok(Match { games })
@@ -266,6 +266,36 @@ fn e_state(machine: &mut GameCoreMachine,
            player: Player,
            pa_pos_ptr: MWord, pb_pos_ptr: MWord,
            pa_energy_ptr: MWord, pb_energy_ptr: MWord) -> MWord {
+
+    const ERR_BAD_STORE: MWord = 1;
+    
+    // Note that every bot sees itself as player 1,
+    // so for player 2 we have to swap the positions.
+
+    let mut pa_pos = game_state.p1state.pos as MWord;
+    let mut pa_energy = game_state.p1state.energy as MWord;
+    let mut pb_pos = game_state.p2state.pos as MWord;
+    let mut pb_energy = game_state.p2state.energy as MWord;
+
+    if player == Player::P2 {
+        mem::swap(&mut pa_pos, &mut pb_pos);
+        mem::swap(&mut pa_energy, &mut pb_energy);
+    }
+
+    let mem = machine.memory_mut();
+    if mem.store32(&pa_pos_ptr, &pa_pos).is_err() {
+        return ERR_BAD_STORE;
+    }
+    if mem.store32(&pb_pos_ptr, &pb_pos).is_err() {
+        return ERR_BAD_STORE;
+    }
+    if mem.store32(&pa_energy_ptr, &pa_energy).is_err() {
+        return ERR_BAD_STORE;
+    }
+    if mem.store32(&pb_energy_ptr, &pb_energy).is_err() {
+        return ERR_BAD_STORE;
+    }
+
     0
 }
 
