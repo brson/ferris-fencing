@@ -15,9 +15,11 @@ use ckb_vm::CoreMachine;
 use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState, EndState, Turn};
 use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
 use ckb_vm::registers::*;
+use std::convert::TryFrom;
 
 pub mod game;
 mod transition;
+mod cost_model;
 
 pub fn run_match(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Match> {
 
@@ -51,6 +53,8 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
 
     p1m.set_running(true);
     p2m.set_running(true);
+    p1m.set_cycles(0);
+    p2m.set_cycles(0);
 
     let decoder = build_imac_decoder::<u32>();
 
@@ -60,17 +64,18 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
         assert!(p1m.running() == p2m.running());
         if !p1m.running() { break; }
 
-        println!("turn {}", turn_no);
-
         if game_state.borrow().p1next.is_none() {
             p1m.step(&decoder).e()?; // TODO
         }
         if game_state.borrow().p2next.is_none() {
             p2m.step(&decoder).e()?; // TODO
         }
-        game_state.borrow_mut().evaluate(&mut p1m, &mut p2m);
-
-        turn_no += 1;
+        if game_state.borrow().ready_for_turn() {
+            println!("turn {}", turn_no);
+            game_state.borrow_mut().evaluate(&mut p1m, &mut p2m);
+            turn_no += 1;
+            if turn_no == 5 { break; }
+        }
     }
     println!("ending");
 
@@ -104,13 +109,15 @@ impl GameState {
             end: None,
         }
     }
+
+    fn ready_for_turn(&self) -> bool {
+        self.p1next.is_some() && self.p2next.is_some()
+    }
     
     fn evaluate(&mut self, p1m: &mut GameMachine, p2m: &mut GameMachine) {
-        let (p1next, p2next) = if let (Some(p1), Some(p2)) = (self.p1next, self.p2next) {
-            (p1, p2)
-        } else {
-            return;
-        };
+        assert!(self.ready_for_turn());
+        let (p1next, p2next) = (self.p1next.expect("p1next"),
+                                self.p2next.expect("p2next"));
 
         let this_state = ActiveState {
             p1: self.p1state,
@@ -125,6 +132,9 @@ impl GameState {
         println!("evaluating next game state");
 
         let (turn, next_state) = this_state.make_move(move_pair);
+
+        println!("current_state: {:?}", this_state);
+        println!("next_state: {:?}", next_state);
 
         self.past_turns.push(turn);
 
@@ -250,16 +260,20 @@ fn e_move(machine: &mut GameCoreMachine,
 
     println!("making move for {:?}: {:?}", player, move_kind);
 
+    let cycles = i32::try_from(machine.cycles()).expect("cycle overflow");
+
     match player {
         Player::P1 => game_state.p1next = Some(Move {
             kind: move_kind,
-            energy_spent: 0,
+            energy_spent: cycles,
         }),
         Player::P2 => game_state.p2next = Some(Move {
             kind: move_kind,
-            energy_spent: 0,
+            energy_spent: cycles,
         }),
     }
+
+    machine.set_cycles(0);
 
     0
 }           
@@ -271,6 +285,7 @@ fn make_vm<'a>(sys: GameSyscalls) -> BResult<GameMachine<'a>> {
     let core_machine = DefaultCoreMachine::default();
     let builder = DefaultMachineBuilder::new(core_machine);
     let builder = builder.syscall(Box::new(sys));
+    let builder = builder.instruction_cycle_func(Box::new(cost_model::instruction_cycles));
     let machine = builder.build();
     Ok(machine)
 }
