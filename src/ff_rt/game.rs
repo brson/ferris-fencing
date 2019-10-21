@@ -18,18 +18,19 @@ pub struct Turn {
     moves: MovePair,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct ActiveState {
     pub p1: PlayerState,
     pub p2: PlayerState,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct PlayerState {
     pub pos: i32,
     pub energy: i32,
 }
 
+#[derive(Debug)]
 pub enum EndState {
     P1Victory(ActiveState),
     P2Victory(ActiveState),
@@ -44,17 +45,17 @@ pub enum EndState {
 
 #[derive(Copy, Clone)]
 pub struct MovePair {
-    p1: Move,
-    p2: Move,
+    pub p1: Move,
+    pub p2: Move,
 }
 
 #[derive(Copy, Clone)]
 pub struct Move {
-    kind: MoveKind,
-    energy_spent: i32,
+    pub kind: MoveKind,
+    pub energy_spent: i32,
 }
 
-#[derive(Eq, PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub enum MoveKind {
     Back,
     Stand,
@@ -63,11 +64,13 @@ pub enum MoveKind {
     NoEnergy,
 }
 
+#[derive(Debug)]
 pub enum NextGameState {
     Active(ActiveState),
     End(EndState),
 }
 
+#[derive(Debug)]
 pub struct DecisionState {
     p1_dist_from_wall: i32,
     p2_dist_from_wall: i32,
@@ -92,8 +95,6 @@ impl ActiveState {
     }
 
     pub fn decision_state(&self) -> DecisionState {
-        self.assert();
-
         let ds = DecisionState {
             p1_dist_from_wall: self.p1.pos,
             p2_dist_from_wall: (GAME_FIELD_SIZE - 1) - self.p2.pos,
@@ -102,7 +103,8 @@ impl ActiveState {
             p2_energy: self.p2.energy,
         };
 
-        ds.assert();
+        println!("as: {:?}", self);
+        println!("ds: {:?}", ds);
 
         ds
     }
@@ -197,6 +199,8 @@ impl ActiveState {
             EndP2Survive => p2survive,
             EndEnergy => energy,
         };
+
+        println!("ngs: {:?}", ngs);
 
         ngs.assert();
 
