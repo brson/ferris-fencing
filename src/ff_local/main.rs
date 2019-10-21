@@ -53,7 +53,7 @@ fn print_match_results(match_res: &Match) {
     println!();
     println!("match results:");
     for (i, game) in match_res.games.iter().enumerate() {
-        println!(" game {}", i);
+        println!(" game {}:", i);
         for (i, turn) in game.turns.iter().enumerate() {
             let grid = graphic_grid(&turn.state);
             let energy = graphic_energy(&turn.state);
@@ -62,7 +62,7 @@ fn print_match_results(match_res: &Match) {
             //println!("  energy   : {}", energy);
             //println!("  moves    : {}", moves);
         }
-        println!();
+        println!("  -------");
         let grid = graphic_end_grid(&game.end);
         let energy = graphic_energy(&game.end.inner_state());
         let winner = game.end.winner();
