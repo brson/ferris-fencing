@@ -14,6 +14,7 @@ use ckb_vm::Syscalls;
 use ckb_vm::CoreMachine;
 use crate::game::{Match, Game, PlayerState};
 use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
+use ckb_vm::registers::*;
 
 pub mod game;
 mod transition;
@@ -99,7 +100,7 @@ impl GameState {
             return;
         }
 
-        
+        // TODO
 
         self.p1waiting = false;
         self.p2waiting = false;
@@ -121,7 +122,7 @@ impl GameState {
     }
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Copy, Clone)]
 enum Player { P1, P2 }
 
 struct GameSyscalls {
@@ -133,18 +134,27 @@ impl Syscalls<GameCoreMachine> for GameSyscalls {
     fn initialize(&mut self, machine: &mut GameCoreMachine) -> Result<(), CkbError> { Ok(()) }
 
     fn ecall(&mut self, machine: &mut GameCoreMachine) -> Result<bool, CkbError> {
-        use ckb_vm::registers::*;
-
+        let mut game_state = self.game_state.borrow_mut();
         let num = machine.registers()[A7];
         match num as u32 {
             ECALL_STATE => {
-                println!("ecall state");
-                machine.set_running(false);
+                ecall4(machine, |m, pa_pos_ptr, pb_pos_ptr, pa_energy_ptr, pb_energy_ptr| {
+                    let r = e_state(m,
+                                    &mut game_state,
+                                    self.player,
+                                    pa_pos_ptr, pb_pos_ptr,
+                                    pa_energy_ptr, pb_energy_ptr);
+                    r
+                });
                 Ok(true)
             },
             ECALL_MOVE => {
-                println!("ecall move");
-                machine.set_running(false);
+                ecall1(machine, |m, move_kind| {
+                    e_move(m,
+                           &mut game_state,
+                           self.player,
+                           move_kind)
+                });
                 Ok(true)
             },
             _ => Ok(false),
@@ -152,17 +162,42 @@ impl Syscalls<GameCoreMachine> for GameSyscalls {
     }
 }
 
+fn ecall4<F>(m: &mut GameCoreMachine, mut f: F)
+    where F: FnMut(&mut GameCoreMachine, u32, u32, u32, u32) -> u32
+{
+    let arg0 = m.registers()[A0];
+    let arg1 = m.registers()[A1];
+    let arg2 = m.registers()[A2];
+    let arg3 = m.registers()[A3];
+    let r = f(m, arg0, arg1, arg2, arg3);
+    m.set_register(A0, r);
+}
+
+fn ecall1<F>(m: &mut GameCoreMachine, mut f: F)
+    where F: FnMut(&mut GameCoreMachine, u32) -> u32
+{
+    let arg0 = m.registers()[A0];
+    let r = f(m, arg0);
+    m.set_register(A0, r);
+}
+
 const ECALL_STATE: u32 = 0x0100;
 const ECALL_MOVE: u32 =  0x0101;
 
-fn e_state(game_state: &GameState,
-           p1_pos: &mut i32, p2_pos: &mut i32,
-           p1_energy: &mut i32, p2_energy: &mut i32) -> i32 {
+type MWord = u32;
+
+fn e_state(machine: &mut GameCoreMachine,
+           game_state: &GameState,
+           player: Player,
+           pa_pos_ptr: MWord, pb_pos_ptr: MWord,
+           pa_energy_ptr: MWord, pb_energy_ptr: MWord) -> MWord {
     0
 }
 
-fn e_move(game_state: &mut GameState,
-          move_kind: i32) -> i32 {
+fn e_move(machine: &mut GameCoreMachine,
+          game_state: &mut GameState,
+          player: Player,
+          move_kind: MWord) -> MWord {
     0
 }           
 
