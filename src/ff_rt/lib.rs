@@ -12,8 +12,8 @@ use ckb_vm::decoder::{build_imac_decoder, Decoder};
 use ckb_vm::Error as CkbError;
 use ckb_vm::Syscalls;
 use ckb_vm::CoreMachine;
-use crate::game::{Match, Game};
-use crate::game::GAMES_PER_MATCH;
+use crate::game::{Match, Game, PlayerState};
+use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
 
 pub mod game;
 mod transition;
@@ -30,10 +30,7 @@ pub fn run_match(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Match> {
 }
 
 fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
-    let game_state = Rc::new(RefCell::new(GameState {
-        p1wait: false,
-        p2wait: false,
-    }));
+    let game_state = Rc::new(RefCell::new(GameState::new()));
 
     let p1syscalls = GameSyscalls {
         player: Player::P1,
@@ -60,13 +57,13 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
         assert!(p1m.running() == p2m.running());
         if !p1m.running() { break; }
 
-        if !game_state.borrow().p1wait {
+        if !game_state.borrow().p1waiting {
             p1m.step(&decoder).e()?; // TODO
         }
-        if !game_state.borrow().p2wait {
+        if !game_state.borrow().p2waiting {
             p2m.step(&decoder).e()?; // TODO
         }
-        game_state.borrow_mut().evaluate();
+        game_state.borrow_mut().evaluate(&mut p1m, &mut p2m);
     }
     println!("ending");
 
@@ -75,12 +72,37 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
 }    
 
 struct GameState {
-    pub p1wait: bool,
-    pub p2wait: bool,
+    pub p1waiting: bool,
+    pub p2waiting: bool,
+    pub p1state: PlayerState,
+    pub p2state: PlayerState,
 }
 
 impl GameState {
-    fn evaluate(&mut self) {
+    fn new() -> GameState {
+        GameState {
+            p1waiting: false,
+            p2waiting: false,
+            p1state: PlayerState {
+                pos: P1_START_POS,
+                energy: START_ENERGY,
+            },
+            p2state: PlayerState {
+                pos: P2_START_POS,
+                energy: START_ENERGY,
+            },
+        }
+    }
+    
+    fn evaluate(&mut self, p1m: &mut GameMachine, p2m: &mut GameMachine) {
+        if !(self.p1waiting && self.p2waiting) {
+            return;
+        }
+
+        
+
+        self.p1waiting = false;
+        self.p2waiting = false;
     }
 
     fn to_game_result(&self) -> Game {

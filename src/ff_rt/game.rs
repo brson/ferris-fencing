@@ -1,5 +1,7 @@
 pub const GAME_FIELD_SIZE: i32 = 12;
-pub const STARTING_ENERGY: i32 = 10000;
+pub const P1_START_POS: i32 = 1;
+pub const P2_START_POS: i32 = 10;
+pub const START_ENERGY: i32 = 10000;
 pub const GAMES_PER_MATCH: usize = 5;
 
 pub struct Match {
@@ -85,8 +87,8 @@ impl ActiveState {
 
         assert!(self.p1.energy > 0);
         assert!(self.p2.energy > 0);
-        assert!(self.p1.energy <= STARTING_ENERGY);
-        assert!(self.p2.energy <= STARTING_ENERGY);
+        assert!(self.p1.energy <= START_ENERGY);
+        assert!(self.p2.energy <= START_ENERGY);
     }
 
     pub fn decision_state(&self) -> DecisionState {
@@ -94,8 +96,8 @@ impl ActiveState {
 
         let ds = DecisionState {
             p1_dist_from_wall: self.p1.pos,
-            p2_dist_from_wall: (GAME_FIELD_SIZE - 1).checked_sub(self.p2.pos).expect("p2_pos_from_wall"),
-            separation_dist: self.p2.pos.checked_sub(self.p1.pos).expect("separation_dist"),
+            p2_dist_from_wall: (GAME_FIELD_SIZE - 1) - self.p2.pos,
+            separation_dist: self.p2.pos - self.p1.pos - 1,
             p1_energy: self.p1.energy,
             p2_energy: self.p2.energy,
         };
@@ -264,8 +266,8 @@ impl EndState {
         //assert!(s.p1.pos != s.p2.pos);
         //assert!(s.p1.pos < s.p2.pos);
 
-        assert!(s.p1.energy <= STARTING_ENERGY);
-        assert!(s.p2.energy <= STARTING_ENERGY);
+        assert!(s.p1.energy <= START_ENERGY);
+        assert!(s.p2.energy <= START_ENERGY);
     }
 }
 
