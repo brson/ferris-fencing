@@ -74,7 +74,7 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
             println!("turn {}", turn_no);
             game_state.borrow_mut().evaluate(&mut p1m, &mut p2m);
             turn_no += 1;
-            if turn_no == 5 { break; }
+            //if turn_no == 5 { break; }
         }
     }
     println!("ending");
@@ -87,6 +87,8 @@ struct GameState {
     pub past_turns: Vec<Turn>,
     pub p1state: PlayerState,
     pub p2state: PlayerState,
+    pub p1cycles: i32,
+    pub p2cycles: i32,
     pub p1next: Option<Move>,
     pub p2next: Option<Move>,
     pub end: Option<EndState>,
@@ -104,6 +106,8 @@ impl GameState {
                 pos: P2_START_POS,
                 energy: START_ENERGY,
             },
+            p1cycles: 0,
+            p2cycles: 0,
             p1next: None,
             p2next: None,
             end: None,
@@ -263,17 +267,24 @@ fn e_move(machine: &mut GameCoreMachine,
     let cycles = i32::try_from(machine.cycles()).expect("cycle overflow");
 
     match player {
-        Player::P1 => game_state.p1next = Some(Move {
-            kind: move_kind,
-            energy_spent: cycles,
-        }),
-        Player::P2 => game_state.p2next = Some(Move {
-            kind: move_kind,
-            energy_spent: cycles,
-        }),
+        Player::P1 => {
+            assert!(cycles >= game_state.p1cycles);
+            game_state.p1next = Some(Move {
+                kind: move_kind,
+                energy_spent: cycles.checked_sub(game_state.p1cycles)
+                    .expect("cycle counting"),
+            });
+            game_state.p1cycles = cycles;
+        },
+        Player::P2 => {
+            game_state.p2next = Some(Move {
+                kind: move_kind,
+                energy_spent: cycles.checked_sub(game_state.p2cycles)
+                    .expect("cycle counting"),
+            });
+            game_state.p2cycles = cycles;
+        },
     }
-
-    machine.set_cycles(0);
 
     0
 }           
@@ -282,7 +293,7 @@ type GameCoreMachine = DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32
 type GameMachine<'a> = DefaultMachine<'a, GameCoreMachine>;
 
 fn make_vm<'a>(sys: GameSyscalls) -> BResult<GameMachine<'a>> {
-    let core_machine = DefaultCoreMachine::default();
+    let core_machine = DefaultCoreMachine::new_with_max_cycles(START_ENERGY as u64);
     let builder = DefaultMachineBuilder::new(core_machine);
     let builder = builder.syscall(Box::new(sys));
     let builder = builder.instruction_cycle_func(Box::new(cost_model::instruction_cycles));
