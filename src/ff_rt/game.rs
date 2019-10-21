@@ -13,6 +13,7 @@ pub struct Game {
     pub end: EndState,
 }
 
+#[derive(Copy, Clone)]
 pub struct Turn {
     state: ActiveState,
     moves: MovePair,
@@ -30,7 +31,7 @@ pub struct PlayerState {
     pub energy: i32,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum EndState {
     P1Victory(ActiveState),
     P2Victory(ActiveState),
@@ -272,6 +273,22 @@ impl EndState {
 
         assert!(s.p1.energy <= START_ENERGY);
         assert!(s.p2.energy <= START_ENERGY);
+    }
+
+    pub fn inner_state(&self) -> ActiveState {
+        use EndState::*;
+
+        match *self {
+            P1Victory(s) => s,
+            P2Victory(s) => s,
+            P1Pin(s) => s,
+            P2Pin(s) => s,
+            P1Survive(s) => s,
+            P2Survive(s) => s,
+            P1Energy(s) => s,
+            P2Energy(s) => s,
+            EnergyTie(s) => s,
+        }
     }
 }
 

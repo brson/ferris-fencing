@@ -12,7 +12,7 @@ use ckb_vm::decoder::{build_imac_decoder, Decoder};
 use ckb_vm::Error as CkbError;
 use ckb_vm::Syscalls;
 use ckb_vm::CoreMachine;
-use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState};
+use crate::game::{Match, Game, PlayerState, Move, MoveKind, MovePair, NextGameState, ActiveState, EndState, Turn};
 use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY};
 use ckb_vm::registers::*;
 
@@ -79,15 +79,18 @@ fn run_game(p1exe: &Bytes, p2exe: &Bytes) -> BResult<Game> {
 }    
 
 struct GameState {
+    pub past_turns: Vec<Turn>,
     pub p1state: PlayerState,
     pub p2state: PlayerState,
     pub p1next: Option<Move>,
     pub p2next: Option<Move>,
+    pub end: Option<EndState>,
 }
 
 impl GameState {
     fn new() -> GameState {
         GameState {
+            past_turns: vec![],
             p1state: PlayerState {
                 pos: P1_START_POS,
                 energy: START_ENERGY,
@@ -98,6 +101,7 @@ impl GameState {
             },
             p1next: None,
             p2next: None,
+            end: None,
         }
     }
     
@@ -122,12 +126,17 @@ impl GameState {
 
         let (turn, next_state) = this_state.make_move(move_pair);
 
+        self.past_turns.push(turn);
+
         match next_state {
             NextGameState::Active(state) => {
                 self.p1state = state.p1;
                 self.p2state = state.p2;
             },
             NextGameState::End(state) => {
+                self.p1state = state.inner_state().p1;
+                self.p2state = state.inner_state().p2;
+                self.end = Some(state);
                 p1m.set_running(false);
                 p2m.set_running(false);
             }
@@ -138,17 +147,9 @@ impl GameState {
     }
 
     fn to_game_result(&self) -> Game {
-        use game::*;
         Game {
-            turns: vec![],
-            end: EndState::EnergyTie(ActiveState {
-                p1: PlayerState {
-                    pos: 0, energy: 0,
-                },
-                p2: PlayerState {
-                    pos: 0, energy: 0,
-                },
-            }),
+            turns: self.past_turns.clone(),
+            end: self.end.expect("end state"),
         }
     }
 }
