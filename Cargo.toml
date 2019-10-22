@@ -5,6 +5,7 @@ members = [
     "src/example_bot",
     "src/ff_rt",
     "src/ff_local",
+    "src/ff_web_common",
 ]
 
 [profile.dev]

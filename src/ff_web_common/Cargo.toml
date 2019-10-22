@@ -1,0 +1,19 @@
+[package]
+name = "ff_web_common"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+ff_rt = { path = "../ff_rt" }
+log = "0.4.8"
+rand = "0.7.2"
+unicode-segmentation = "1.3.0"
+blake2-rfc = "0.2.18"
+hex = "0.4.0"
+
+[dependencies.b_error]
+git = "https://github.com/brson/bloop.git"
+rev = "474fc1309eff36a65113000eb6e0dcd9d9e95316"
