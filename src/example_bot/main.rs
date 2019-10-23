@@ -22,12 +22,7 @@ fn main() {
 
         assert!(other_pos - my_pos > 0);
         let sep = other_pos - my_pos - 1;
-        let mut next_move = MOVE_FORWARD;
-        if sep == 1 && my_pos >= 3 {
-            next_move = MOVE_BACK;
-        } else if sep == 2 {
-            next_move = MOVE_LUNGE;
-        }
+        let next_move = MOVE_FORWARD;
 
         let r = e_move(next_move);
         assert!(r == 0);
