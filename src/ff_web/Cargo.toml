@@ -1,0 +1,16 @@
+[package]
+name = "ff_web"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "ff-web"
+path = "main.rs"
+
+[dependencies]
+ff_web_common = { path = "../ff_web_common" }
+hyper = "0.12.35"
+
+[dependencies.b_error]
+git = "https://github.com/brson/bloop.git"
+rev = "474fc1309eff36a65113000eb6e0dcd9d9e95316"
