@@ -1,3 +1,7 @@
+use std::path::PathBuf;
+use std::fs;
+use bytes::Bytes;
+use structopt::StructOpt;
 use ckb_vm::{
     SparseMemory, DefaultCoreMachine, SupportMachine,
     WXorXMemory, DefaultMachineBuilder, DefaultMachine,
@@ -5,13 +9,23 @@ use ckb_vm::{
 use ckb_vm::decoder::build_imac_decoder;
 use b_error::{BResult, ResultExt};
 
+#[derive(StructOpt)]
+struct Opts {
+    exe: PathBuf,
+}
+
 fn main() {
     b_error::main(run)
 }
 
 fn run() -> BResult<()> {
+    let opts = Opts::from_args();
+    let exe = fs::read(&opts.exe).ec("reading exe")?;
+    let exe = Bytes::from(exe);
     let decoder = build_imac_decoder::<u32>();
+
     let mut vm = make_vm();
+    vm.load_program(&exe, &[]).ec("loading exe")?;
     vm.set_running(true);
     while vm.running() {
         vm.step(&decoder).ec("stepping")?;

@@ -4,8 +4,7 @@
 extern crate env_logger;
 
 use bytes::Bytes;
-use std::io::Read;
-use std::fs::File;
+use std::fs;
 use b_error::{BResult, ResultExt};
 use std::path::{PathBuf, Path};
 use structopt::StructOpt;
@@ -42,9 +41,9 @@ fn run() -> BResult<()> {
 }
 
 fn load_file(path: &Path) -> BResult<Bytes> {
-    let mut file = File::open(path).e()?;
+    let mut file = File::open(path).ec("opening exe")?;
     let mut buffer = Vec::new();
-    file.read_to_end(&mut buffer).e()?;
+    file.read_to_end(&mut buffer).ec("reading exe")?;
     let buffer = Bytes::from(buffer);
     Ok(buffer)
 }
