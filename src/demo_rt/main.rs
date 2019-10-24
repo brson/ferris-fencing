@@ -19,6 +19,7 @@ fn main() {
 }
 
 fn run() -> BResult<()> {
+    env_logger::init();
     let opts = Opts::from_args();
     let exe = fs::read(&opts.exe).ec("reading exe")?;
     let exe = Bytes::from(exe);

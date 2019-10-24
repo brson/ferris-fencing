@@ -4,7 +4,8 @@
 extern crate env_logger;
 
 use bytes::Bytes;
-use std::fs;
+use std::fs::File;
+use std::io::Read;
 use b_error::{BResult, ResultExt};
 use std::path::{PathBuf, Path};
 use structopt::StructOpt;

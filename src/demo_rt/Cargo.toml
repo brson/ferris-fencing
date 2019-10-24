@@ -10,10 +10,11 @@ path = "main.rs"
 [dependencies]
 structopt = "0.3.3"
 bytes = "0.4.12"
+env_logger = "0.7.1"
 
 [dependencies.ckb-vm]
 git = "https://github.com/brson/ckb-vm.git"
-rev = "3a809f14e3781d98ea895376bba75785ec7ac83c"
+rev = "f49edd17927d0158289a5f5ed500c86f5e0816c1"
 
 [dependencies.b_error]
 git = "https://github.com/brson/bloop.git"
