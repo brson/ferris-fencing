@@ -2,6 +2,8 @@
 members = [
     "src/ckb_vm_glue",
     "src/ckb_vm_syscall",
+    "src/demo_exe",
+    "src/demo_rt",
     "src/example_bot",
     "src/ff_rt",
     "src/ff_local",

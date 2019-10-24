@@ -358,7 +358,7 @@ type GameCoreMachine = DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32
 type GameMachine<'a> = DefaultMachine<'a, GameCoreMachine>;
 
 fn make_vm<'a>(sys: GameSyscalls) -> BResult<GameMachine<'a>> {
-    let core_machine = DefaultCoreMachine::new_with_max_cycles(START_ENERGY as u64);
+    let core_machine = GameCoreMachine::new_with_max_cycles(START_ENERGY as u64);
     let builder = DefaultMachineBuilder::new(core_machine);
     let builder = builder.syscall(Box::new(sys));
     let builder = builder.instruction_cycle_func(Box::new(cost_model::instruction_cycles));

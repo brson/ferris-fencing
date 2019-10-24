@@ -1,0 +1,8 @@
+[package]
+name = "demo_exe"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "demo-exe"
+path = "main.rs"
