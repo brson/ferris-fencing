@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+html {
+    font-family: 'Lato', sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-size: 10pt;
+}
+
 * {
     --column-size: 10%;
     --bg-color: #222;
@@ -33,11 +44,28 @@ body {
     flex-direction: column;
 }
 
+#moves {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size);
+}
+
+#moves > div {
+    text-align: center;
+    font-weight: bold;
+}
+
 #playfieldbox {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 #playfield {
@@ -76,7 +104,6 @@ img {
 }
 
 #energybox {
-    height: 10px;
     display: grid;
     grid-template-columns: 50% 50%;
 }
@@ -101,7 +128,7 @@ img {
 }
 
 .energy {
-    height: 100%;
+    height: 2px;
 }
 
 #p1energy {
@@ -114,5 +141,31 @@ img {
     width: 100%;
 }
 
-#scorebox {
+#statusbox {
+    border-bottom: 1px solid orange;
+}
+
+#statusbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+#statusbox > div {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+#statusbox > div:first-child {
+    margin-left: 0;
+}
+
+#statusbox > div:last-child {
+    margin-right: 0;
+}
+
+#statusbox > #status-msg {
+    flex-basis: 100%;
+    text-align: center;
 }
