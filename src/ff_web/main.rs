@@ -72,7 +72,7 @@ fn serve(req: Request<Body>) -> Box<dyn Future<Item = Response<Body>, Error = BE
             make_match()
         }
         _ => {
-            make_404()
+            make_404_f()
         }
     }
 }
@@ -81,17 +81,17 @@ fn make_match() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send>
     let (tx, mut rx) = oneshot::channel();
     thread::spawn(|| {
         let store = Store;
-        let match_ = load_random_match();
-        let body = match match_ {
+        let match_ = load_random_match_json();
+        let r = match match_ {
             Ok(m) => {
-                Body::empty()
+                Body::from(m)
             }
             Err(e) => {
                 Body::empty()
             }
         };
-        //let _ = tx.send(r);
         panic!()
+        //let _ = tx.send(r);
     });
 
     let r: BResult<Response<Body>> = rx.try_recv()
@@ -99,20 +99,26 @@ fn make_match() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send>
     Box::new(future::result(r))
 }
 
+fn load_random_match_json() -> BResult<String> {
+    panic!()
+}
+
 fn load_random_match() -> BResult<FullMatch> {
     panic!()
 }    
 
-fn make_internal_error() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
-    Box::new(future::result(
-        Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body(Body::empty())
-            .map_err(|e| BError::from_source(e, "making response"))
-    ))
+fn make_500() -> BResult<Response<Body>> {
+    Response::builder()
+        .status(StatusCode::INTERNAL_SERVER_ERROR)
+        .body(Body::empty())
+        .map_err(|e| BError::from_source(e, "making response"))
 }
 
-fn make_404() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
+fn make_500_f() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
+    Box::new(future::result(make_500()))
+}
+
+fn make_404_f() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
     Box::new(future::result(
         Response::builder()
             .status(StatusCode::NOT_FOUND)
