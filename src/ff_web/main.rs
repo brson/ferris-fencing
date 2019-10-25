@@ -81,22 +81,26 @@ fn make_match() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send>
     let (tx, mut rx) = oneshot::channel();
     thread::spawn(|| {
         let store = Store;
-        let match_ = load_random_match_json();
-        let r = match match_ {
+        let match_ = load_random_match_resp();
+        let r: BResult<Response<Body>> = match match_ {
             Ok(m) => {
-                Body::from(m)
+                Ok(m)
             }
             Err(e) => {
-                Body::empty()
+                make_500()
             }
         };
-        panic!()
-        //let _ = tx.send(r);
+        let _ = tx.send(r);
     });
 
-    let r: BResult<Response<Body>> = rx.try_recv()
+    let r: BResult<BResult<Response<Body>>> = rx.try_recv()
         .map_err(|e| BError::from_source(e, "recieving response"));
+    let r: BResult<Response<Body>> = r.and_then(|r| r);
     Box::new(future::result(r))
+}
+
+fn load_random_match_resp() -> BResult<Response<Body>> {
+    panic!()
 }
 
 fn load_random_match_json() -> BResult<String> {
@@ -104,7 +108,8 @@ fn load_random_match_json() -> BResult<String> {
 }
 
 fn load_random_match() -> BResult<FullMatch> {
-    panic!()
+    let store = Store;
+    store.load_random_match()
 }    
 
 fn make_500() -> BResult<Response<Body>> {
