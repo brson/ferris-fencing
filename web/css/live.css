@@ -4,6 +4,8 @@
     --fg-color: #DDD;
     --ff-color: #F74C00;
     --wall-color: #444;
+    --p1-color: red;
+    --p2-color: green;
 }
 
 * {
@@ -12,6 +14,7 @@
 
 html {
     height: 100%;
+    color: var(--fg-color);
 }
 
 body {
@@ -25,10 +28,14 @@ body {
     max-height: 100%;
 }
 
-#playfieldbox {
-    height: 100%;
+#frame {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+}
+
+#playfieldbox {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -68,3 +75,44 @@ img {
     width: 100%;
 }
 
+#energybox {
+    height: 10px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+#energybox > div {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    margin: 2px 0 2px 0;
+}
+
+#energybox > div:nth-child(2) {
+    justify-content: flex-end;
+}
+
+#energybox > div:nth-child(1) {
+    padding-right: 1px;
+}
+
+#energybox > div:nth-child(2) {
+    padding-left: 1px;
+}
+
+.energy {
+    height: 100%;
+}
+
+#p1energy {
+    background-color: var(--p1-color);
+    width: 100%;
+}
+
+#p2energy {
+    background-color: var(--p2-color);
+    width: 100%;
+}
+
+#scorebox {
+}
