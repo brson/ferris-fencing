@@ -3,6 +3,9 @@
 #[macro_use]
 extern crate log;
 
+use std::thread;
+use ff_web_common::store::Store;
+use tokio::sync::oneshot;
 use std::net::SocketAddr;
 use futures::{future, future::Either, Future};
 use env_logger::{Builder, Env};
@@ -74,7 +77,23 @@ fn serve(req: Request<Body>) -> Box<dyn Future<Item = Response<Body>, Error = BE
 }
 
 fn make_match() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
-    panic!()
+    let (tx, mut rx) = oneshot::channel();
+    thread::spawn(|| {
+        let store = Store;
+
+        let body = Body::empty();
+        let _ = tx.send(body);
+    });
+
+    let body = rx.try_recv()
+        .map_err(|e| BError::from_source(e, "recieving match"));
+    let r = body.and_then(|b| {
+        Response::builder()
+            .status(StatusCode::OK)
+            .body(b)
+            .map_err(|e| BError::from_source(e, "making response"))
+    });
+    Box::new(future::result(r))
 }
 
 fn make_404() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {

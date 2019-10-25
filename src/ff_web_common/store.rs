@@ -1,4 +1,4 @@
-#[allow(unused)]
+#![allow(unused)]
 
 use b_error::{BResult, BError};
 use crate::bot_id::BotId;
@@ -6,6 +6,7 @@ use crate::bot_name::BotName;
 use crate::bot_hash::BotHash;
 use crate::bot_exe::BotExe;
 use crate::bot::Bot;
+use crate::types::FullMatch;
 
 pub const MAX_BIN_SIZE: usize = 1024 * 1000;
 
@@ -34,6 +35,10 @@ impl Store {
     }
 
     pub fn load_bot_exe(id: BotId) -> BResult<Option<BotExe>> {
+        panic!()
+    }
+
+    pub fn load_random_match() -> BResult<FullMatch> {
         panic!()
     }
 }
