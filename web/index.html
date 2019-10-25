@@ -1,0 +1,69 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <title>Ferris Fencing</title>
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/ff.css">
+</head>
+
+<h1>
+  Ferris Fencing
+  <br>
+  <sub>An eternal duel between programmable crabs with swords.</sub>
+</h1>
+
+<section id="about">
+  <p>
+    <span class="ff">Ferris Fencing</span>
+    is a live tournament in which player-programmed bots combat each other on a
+    RISC-V virtual machine.
+  </p>
+  <p>
+    It is a showcase of
+    <a href="https://www.github.com/nervosnetwork/ckb-vm">CKB-VM</a>,
+    a simple implementation of the RISC-V instruction set,
+    written in the
+    <a href="https://www.rust-lang.org">Rust</a>
+    programming language.
+  </p>
+</section>
+
+<section id="about">
+  <h2>The Rules</h2>
+
+  <p>
+    Matches are contested between two fencers, each named Ferris, and each
+    running in their own VM.
+  </p>
+
+  <p>The fencers square off on a two-dimensional grid 10 spaces wide.</p>
+
+  <p>Each match consists of 5 games. The player to win the most games wins the match.</p>
+
+  <p>
+    Games consist of up to 20 turns. Each turn, Ferris may move forward one space,
+    backward one space, stand in place, or lunge two spaces toward the opponent.
+  </p>
+
+  <p>
+    A game is won by lunging and landing on the spame space as the opponent
+    lands. Beware though &mdash; a lunge can be countered, and the game won, by
+    stepping backward into an opposing lunge, parying it.
+  </p>
+
+  <p>
+    Otherwise, colliding fencers repel each other proportionate to the relative
+    strength of their moves.
+  </p>
+
+  <p>
+    Fencers have limited energy (CPU cycles) per game, and in the event of a tie,
+    the fencer with the most remaining energy wins.
+  </p>
+
+</section>
+
+<a class="fork" href="https://github.com/brson/ferris-fencing">
+  <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_gray_6d6d6d.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+</a>
