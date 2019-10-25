@@ -1,3 +1,11 @@
+* {
+    --bg-color: #222;
+    --fg-color: #DDD;
+    --ff-color: #F74C00;
+    --sec-border-pad: 2px;
+    --sec-border-sep: 10px;
+}
+
 html {
     box-model: border-box;
 }
@@ -10,10 +18,73 @@ html {
     font-family: 'Lato', sans-serif;
     font-family: 'Open Sans', sans-serif;
     font-family: 'Roboto', sans-serif;
+    font-size: 14pt;
 }
 
-.fork {
-    position: absolute;
-    right: 0;
-    top: 0;
+body {
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    padding: 0 2rem 0 2rem;
+}
+
+h1 {
+    font-size: 150%;
+}
+
+h2 {
+    font-size: 120%;
+}
+
+h1 {
+    text-align: center;
+    color: var(--ff-color);
+    font-weight: bold;
+}
+
+h2 {
+    text-align: center;
+    border: var(--sec-border-pad) solid var(--ff-color);
+    padding: var(--sec-border-sep);
+    margin-bottom: 2rem;
+}
+
+h1 {
+    text-align: center;
+    background-color: var(--ff-color);
+    color: var(--bg-color);
+    padding: 1rem;
+    letter-spacing: 0.5rem;
+}
+
+.tagline {
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 2rem;
+    font-style: italic;
+}
+
+p {
+    margin: 1rem 0 1rem 0;
+}
+
+section {
+    margin: 2rem auto 4rem auto;
+    max-width: 40rem;
+}
+
+a {
+    color: var(--ff-color);
+    text-decoration: none;
+}
+
+#about ul {
+    width: 10rem;
+    margin-left: auto;
+    margin-right: auto;
+    list-style: none;
+}
+
+#about li {
+    text-align: center;
+    line-height: 2em;
 }
