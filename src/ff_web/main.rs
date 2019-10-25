@@ -14,6 +14,7 @@ use http::status::StatusCode;
 use http::Uri;
 use hyper::{header, service::service_fn, Body, Request, Response, Server};
 use structopt::StructOpt;
+use ff_web_common::types::FullMatch;
 
 fn main() {
     b_error::main(run)
@@ -80,20 +81,35 @@ fn make_match() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send>
     let (tx, mut rx) = oneshot::channel();
     thread::spawn(|| {
         let store = Store;
-
-        let body = Body::empty();
-        let _ = tx.send(body);
+        let match_ = load_random_match();
+        let body = match match_ {
+            Ok(m) => {
+                Body::empty()
+            }
+            Err(e) => {
+                Body::empty()
+            }
+        };
+        //let _ = tx.send(r);
+        panic!()
     });
 
-    let body = rx.try_recv()
-        .map_err(|e| BError::from_source(e, "recieving match"));
-    let r = body.and_then(|b| {
-        Response::builder()
-            .status(StatusCode::OK)
-            .body(b)
-            .map_err(|e| BError::from_source(e, "making response"))
-    });
+    let r: BResult<Response<Body>> = rx.try_recv()
+        .map_err(|e| BError::from_source(e, "recieving response"));
     Box::new(future::result(r))
+}
+
+fn load_random_match() -> BResult<FullMatch> {
+    panic!()
+}    
+
+fn make_internal_error() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
+    Box::new(future::result(
+        Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::empty())
+            .map_err(|e| BError::from_source(e, "making response"))
+    ))
 }
 
 fn make_404() -> Box<dyn Future<Item = Response<Body>, Error = BError> + Send> {
