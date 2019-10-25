@@ -44,6 +44,8 @@ pub enum EndState {
     P1Energy(ActiveState),
     P2Energy(ActiveState),
     EnergyTie(ActiveState),
+    P1Turns(ActiveState),
+    P2Turns(ActiveState),
     TurnTie(ActiveState),
 }
 
@@ -146,7 +148,12 @@ impl ActiveState {
         };
 
         if turn_no == MAX_TURNS {
-            return (turn, End(EndState::TurnTie(self)));
+            let ngs = match self.p1.energy.cmp(&self.p2.energy) {
+                Less => EndState::P2Turns(self),
+                Equal => EndState::TurnTie(self),
+                Greater => EndState::P1Turns(self),
+            };
+            return (turn, End(ngs));
         }
 
         let nm = self.naive_moves(moves);
@@ -276,6 +283,8 @@ impl EndState {
             P1Energy(ref s) => s,
             P2Energy(ref s) => s,
             EnergyTie(ref s) => s,
+            P1Turns(ref s) => s,
+            P2Turns(ref s) => s,
             TurnTie(ref s) => s,
         };
 
@@ -303,6 +312,8 @@ impl EndState {
             P1Energy(s) => s,
             P2Energy(s) => s,
             EnergyTie(s) => s,
+            P1Turns(s) => s,
+            P2Turns(s) => s,
             TurnTie(s) => s,
         }
     }
@@ -320,6 +331,8 @@ impl EndState {
             P1Energy(s) => "player-1",
             P2Energy(s) => "player-2",
             EnergyTie(s) => "tie",
+            P1Turns(s) => "player-1",
+            P2Turns(s) => "player-2",
             TurnTie(s) => "tie",
         }
     }
@@ -337,6 +350,8 @@ impl EndState {
             P1Energy(s) => Some(Player::P1),
             P2Energy(s) => Some(Player::P2),
             EnergyTie(s) => None,
+            P1Turns(s) => Some(Player::P1),
+            P2Turns(s) => Some(Player::P2),
             TurnTie(s) => None,
         }
     }
@@ -354,6 +369,8 @@ impl EndState {
             P1Energy(s) => "more-energy",
             P2Energy(s) => "more-energy",
             EnergyTie(s) => "out-of-energy",
+            P1Turns(s) => "more-energy(out-of-turns)",
+            P2Turns(s) => "more-energy(out-of-turns)",
             TurnTie(s) => "out-of-turns",
         }
     }
