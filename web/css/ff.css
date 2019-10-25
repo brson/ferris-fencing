@@ -6,8 +6,8 @@
     --sec-border-sep: 10px;
 }
 
-html {
-    box-model: border-box;
+* {
+    box-sizing: border-box;
 }
 
 @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
@@ -72,6 +72,11 @@ section {
     max-width: 40rem;
 }
 
+
+section#live {
+    margin-bottom: 2rem;
+}
+
 a {
     color: var(--ff-color);
     text-decoration: none;
@@ -87,4 +92,9 @@ a {
 #about li {
     text-align: center;
     line-height: 2em;
+}
+
+#live iframe {
+    width: 100%;
+    height: 100px;
 }

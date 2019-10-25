@@ -1,0 +1,70 @@
+* {
+    --column-size: 10%;
+    --bg-color: #222;
+    --fg-color: #DDD;
+    --ff-color: #F74C00;
+    --wall-color: #444;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+#frame {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#playfieldbox {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#playfield {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size)
+    var(--column-size);
+    border-bottom: 4px solid var(--ff-color);
+}
+
+#playfield > div {
+    border-left: 2px solid var(--wall-color);
+    border-right: 2px solid var(--wall-color);
+    padding: 0 4px 0 4px;
+}
+
+#playfield > div:first-child {
+    border-left: 4px solid var(--wall-color);
+}
+
+#playfield > div:last-child {
+    border-right: 4px solid var(--wall-color);
+}
+
+img {
+    width: 100%;
+}
+
