@@ -10,6 +10,12 @@ path = "main.rs"
 [dependencies]
 ff_web_common = { path = "../ff_web_common" }
 hyper = "0.12.35"
+http = "0.1.19"
+tokio = "0.1.22"
+futures = "0.1.29"
+structopt = "0.3.3"
+env_logger = "0.7.1"
+log = "0.4.8"
 
 [dependencies.b_error]
 git = "https://github.com/brson/bloop.git"

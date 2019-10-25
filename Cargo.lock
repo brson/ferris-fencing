@@ -310,8 +310,14 @@ name = "ff_web"
 version = "0.1.0"
 dependencies = [
  "b_error",
+ "env_logger",
  "ff_web_common",
+ "futures",
+ "http",
  "hyper",
+ "log",
+ "structopt",
+ "tokio",
 ]
 
 [[package]]
@@ -603,6 +609,17 @@ dependencies = [
  "net2",
  "slab",
  "winapi 0.2.8",
+]
+
+[[package]]
+name = "mio-uds"
+version = "0.6.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "966257a94e196b11bb43aca423754d87429960a768de9414f3691d6957abf125"
+dependencies = [
+ "iovec",
+ "libc",
+ "mio",
 ]
 
 [[package]]
@@ -989,12 +1006,18 @@ dependencies = [
  "futures",
  "mio",
  "num_cpus",
+ "tokio-codec",
  "tokio-current-thread",
  "tokio-executor",
+ "tokio-fs",
  "tokio-io",
  "tokio-reactor",
+ "tokio-sync",
+ "tokio-tcp",
  "tokio-threadpool",
  "tokio-timer",
+ "tokio-udp",
+ "tokio-uds",
 ]
 
 [[package]]
@@ -1006,6 +1029,17 @@ dependencies = [
  "bytes",
  "either",
  "futures",
+]
+
+[[package]]
+name = "tokio-codec"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c501eceaf96f0e1793cf26beb63da3d11c738c4a943fdf3746d81d64684c39f"
+dependencies = [
+ "bytes",
+ "futures",
+ "tokio-io",
 ]
 
 [[package]]
@@ -1026,6 +1060,17 @@ checksum = "0f27ee0e6db01c5f0b2973824547ce7e637b2ed79b891a9677b0de9bd532b6ac"
 dependencies = [
  "crossbeam-utils",
  "futures",
+]
+
+[[package]]
+name = "tokio-fs"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fe6dc22b08d6993916647d108a1a7d15b9cd29c4f4496c62b92c45b5041b7af"
+dependencies = [
+ "futures",
+ "tokio-io",
+ "tokio-threadpool",
 ]
 
 [[package]]
@@ -1109,6 +1154,39 @@ dependencies = [
  "futures",
  "slab",
  "tokio-executor",
+]
+
+[[package]]
+name = "tokio-udp"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f02298505547f73e60f568359ef0d016d5acd6e830ab9bc7c4a5b3403440121b"
+dependencies = [
+ "bytes",
+ "futures",
+ "log",
+ "mio",
+ "tokio-codec",
+ "tokio-io",
+ "tokio-reactor",
+]
+
+[[package]]
+name = "tokio-uds"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "037ffc3ba0e12a0ab4aca92e5234e0dedeb48fddf6ccd260f1f150a36a9f2445"
+dependencies = [
+ "bytes",
+ "futures",
+ "iovec",
+ "libc",
+ "log",
+ "mio",
+ "mio-uds",
+ "tokio-codec",
+ "tokio-io",
+ "tokio-reactor",
 ]
 
 [[package]]
