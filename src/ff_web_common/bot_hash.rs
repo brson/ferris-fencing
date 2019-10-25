@@ -2,6 +2,7 @@ use crate::bot_exe::BotExe;
 use std::fmt::{self, Formatter, Display};
 use blake2_rfc::blake2b::blake2b;
 
+#[derive(Serialize, Deserialize)]
 pub struct BotHash(String);
 
 impl BotHash {

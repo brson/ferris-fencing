@@ -303,6 +303,8 @@ dependencies = [
  "bytes",
  "ckb-vm",
  "log",
+ "serde",
+ "serde_derive",
 ]
 
 [[package]]
@@ -331,6 +333,8 @@ dependencies = [
  "hex",
  "log",
  "rand",
+ "serde",
+ "serde_derive",
  "unicode-segmentation",
 ]
 
@@ -885,6 +889,23 @@ name = "semver-parser"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
+
+[[package]]
+name = "serde"
+version = "1.0.101"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9796c9b7ba2ffe7a9ce53c2287dfc48080f4b2b362fcc245a259b3a7201119dd"
+
+[[package]]
+name = "serde_derive"
+version = "1.0.101"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b133a43a1ecd55d4086bd5b4dc6c1751c68b1bfbeba7a5040442022c7e7c02e"
+dependencies = [
+ "proc-macro2 1.0.6",
+ "quote 1.0.2",
+ "syn 1.0.5",
+]
 
 [[package]]
 name = "slab"

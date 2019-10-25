@@ -1,5 +1,6 @@
 use std::fmt::{self, Formatter, Display};
 
+#[derive(Serialize, Deserialize)]
 pub struct BotId(u64);
 
 impl BotId {

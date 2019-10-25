@@ -9,6 +9,8 @@ path = "lib.rs"
 [dependencies]
 bytes = "0.4.12"
 log = "0.4.8"
+serde = "1.0.101"
+serde_derive = "1.0.101"
 
 [dependencies.ckb-vm]
 git = "https://github.com/brson/ckb-vm.git"

@@ -1,6 +1,7 @@
 use std::fmt::{self, Formatter, Display};
 use unicode_segmentation::UnicodeSegmentation;
 
+#[derive(Serialize, Deserialize)]
 pub struct BotName(String);
 
 impl BotName {

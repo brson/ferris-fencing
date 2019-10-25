@@ -5,34 +5,40 @@ pub const START_ENERGY: i32 = 15000;
 pub const GAMES_PER_MATCH: usize = 1;
 pub const MAX_TURNS: i32 = 20;
 
+#[derive(Serialize, Deserialize)]
 pub struct Match {
     pub games: Vec<Game>,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Debug)]
 pub struct Game {
     pub turns: Vec<Turn>,
     pub end: EndState,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub struct Turn {
     pub state: ActiveState,
     pub moves: MovePair,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub struct ActiveState {
     pub p1: PlayerState,
     pub p2: PlayerState,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub struct PlayerState {
     pub pos: i32,
     pub energy: i32,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub enum EndState {
     P1Victory(ActiveState),
@@ -49,18 +55,21 @@ pub enum EndState {
     TurnTie(ActiveState),
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub struct MovePair {
     pub p1: Move,
     pub p2: Move,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Copy, Clone, Debug)]
 pub struct Move {
     pub kind: MoveKind,
     pub energy_spent: i32,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub enum MoveKind {
     Back,
