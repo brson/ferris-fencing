@@ -1,0 +1,152 @@
+{
+  "games": [
+    {
+      "turns": [
+        {
+          "state": {
+            "p1": {
+              "pos": 1,
+              "energy": 30000
+            },
+            "p2": {
+              "pos": 8,
+              "energy": 30000
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Forward",
+              "energy_spent": 950
+            },
+            "p2": {
+              "kind": "Forward",
+              "energy_spent": 950
+            }
+          }
+        },
+        {
+          "state": {
+            "p1": {
+              "pos": 2,
+              "energy": 29050
+            },
+            "p2": {
+              "pos": 7,
+              "energy": 29050
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Stand",
+              "energy_spent": 2445
+            },
+            "p2": {
+              "kind": "Stand",
+              "energy_spent": 4870
+            }
+          }
+        },
+        {
+          "state": {
+            "p1": {
+              "pos": 2,
+              "energy": 26605
+            },
+            "p2": {
+              "pos": 7,
+              "energy": 24180
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Lunge",
+              "energy_spent": 2448
+            },
+            "p2": {
+              "kind": "Forward",
+              "energy_spent": 2445
+            }
+          }
+        },
+        {
+          "state": {
+            "p1": {
+              "pos": 4,
+              "energy": 24157
+            },
+            "p2": {
+              "pos": 6,
+              "energy": 21735
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Lunge",
+              "energy_spent": 3010
+            },
+            "p2": {
+              "kind": "Lunge",
+              "energy_spent": 2448
+            }
+          }
+        },
+        {
+          "state": {
+            "p1": {
+              "pos": 4,
+              "energy": 21147
+            },
+            "p2": {
+              "pos": 6,
+              "energy": 19287
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Stand",
+              "energy_spent": 2445
+            },
+            "p2": {
+              "kind": "Back",
+              "energy_spent": 2442
+            }
+          }
+        },
+        {
+          "state": {
+            "p1": {
+              "pos": 4,
+              "energy": 18702
+            },
+            "p2": {
+              "pos": 7,
+              "energy": 16845
+            }
+          },
+          "moves": {
+            "p1": {
+              "kind": "Forward",
+              "energy_spent": 2445
+            },
+            "p2": {
+              "kind": "Lunge",
+              "energy_spent": 7292
+            }
+          }
+        }
+      ],
+      "end": {
+        "P2Victory": {
+          "p1": {
+            "pos": 5,
+            "energy": 16257
+          },
+          "p2": {
+            "pos": 5,
+            "energy": 9553
+          }
+        }
+      }
+    }
+  ]
+}
