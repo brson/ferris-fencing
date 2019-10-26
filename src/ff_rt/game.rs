@@ -408,3 +408,15 @@ impl DecisionState {
     }
 }
 
+impl MoveKind {
+    pub fn as_str(&self) -> &'static str {
+        use MoveKind::*;
+        match self {
+            Back => "back",
+            Stand => "stand",
+            Forward => "forward",
+            Lunge => "lunge",
+            NoEnergy => "empty",
+        }
+    }
+}

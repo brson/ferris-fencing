@@ -58,7 +58,7 @@ fn print_match_results(match_res: &Match) {
             let grid = graphic_grid(&turn.state);
             let energy = graphic_energy(&turn.state);
             let moves = graphic_moves(&turn.moves);
-            println!("  turn {:2}: {}", i, grid);
+            println!("  turn {:2}: {} (e {}) (m {})", i, grid, energy, moves);
             //println!("  energy   : {}", energy);
             //println!("  moves    : {}", moves);
         }
@@ -141,9 +141,11 @@ fn graphic_end_grid(s: &EndState) -> String {
 }
 
 fn graphic_energy(s: &ActiveState) -> String {
-    String::new()
+    format!("{:05} | {:05}", s.p1.energy, s.p2.energy)
 }
 
 fn graphic_moves(s: &MovePair) -> String {
-    String::new()
+    let p1 = s.p1.kind.as_str();
+    let p2 = s.p2.kind.as_str();
+    format!("{:7} | {:7}", p1, p2)
 }

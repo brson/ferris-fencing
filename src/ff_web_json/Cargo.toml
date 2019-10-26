@@ -1,0 +1,22 @@
+[package]
+name = "ff_web_json"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "ff-web-json"
+path = "main.rs"
+
+[dependencies]
+ff_rt = { path = "../ff_rt" }
+ff_web_common = { path = "../ff_web_common" }
+structopt = "0.3.3"
+bytes = "0.4.12"
+log = "0.4.8"
+env_logger = "0.7.1"
+serde_json = "1.0.41"
+itertools = "0.8.0"
+
+[dependencies.b_error]
+git = "https://github.com/brson/bloop.git"
+rev = "474fc1309eff36a65113000eb6e0dcd9d9e95316"

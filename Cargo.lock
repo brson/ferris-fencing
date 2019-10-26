@@ -340,6 +340,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "ff_web_json"
+version = "0.1.0"
+dependencies = [
+ "b_error",
+ "bytes",
+ "env_logger",
+ "ff_rt",
+ "ff_web_common",
+ "itertools",
+ "log",
+ "serde_json",
+ "structopt",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -850,6 +865,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ryu"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bfa8506c1de11c9c4e4c38863ccbe02a305c8188e85a05a784c9e11e1c3910c8"
+
+[[package]]
 name = "scopeguard"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -906,6 +927,17 @@ dependencies = [
  "proc-macro2 1.0.6",
  "quote 1.0.2",
  "syn 1.0.5",
+]
+
+[[package]]
+name = "serde_json"
+version = "1.0.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f72eb2a68a7dc3f9a691bfda9305a1c017a6215e5a4545c258500d2099a37c2"
+dependencies = [
+ "itoa",
+ "ryu",
+ "serde",
 ]
 
 [[package]]

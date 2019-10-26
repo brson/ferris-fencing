@@ -9,6 +9,7 @@ members = [
     "src/ff_local",
     "src/ff_web",
     "src/ff_web_common",
+    "src/ff_web_json",
 ]
 
 default-members = [

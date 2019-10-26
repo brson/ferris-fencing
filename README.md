@@ -67,6 +67,7 @@ flag:
 - `ff_rt` - The Ferris Fencing platform runtime. The game logic.
 - `ff_web` - The Ferris Fencing web API.
 - `ff_web_common` - Support library for the website.
+- `ff_web_json` - Runs a match and emits json.
 
 It also contains two `demo_*` projects. These were used in the [Rust.Tokyo 2019]
 talk for which Ferris Fencing was made. On their own they are relatively
