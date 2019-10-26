@@ -1,7 +1,7 @@
 pub const GAME_FIELD_SIZE: i32 = 10;
 pub const P1_START_POS: i32 = 1;
 pub const P2_START_POS: i32 = 8;
-pub const START_ENERGY: i32 = 15000;
+pub const START_ENERGY: i32 = 30000;
 pub const GAMES_PER_MATCH: usize = 1;
 pub const MAX_TURNS: i32 = 20;
 

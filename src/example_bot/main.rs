@@ -11,6 +11,7 @@ fn main() {
     const MOVE_FORWARD: i32 = 3;
     const MOVE_LUNGE: i32 = 4;
 
+    let mut last_move = 1;
     loop {
         let mut my_pos = 0;
         let mut other_pos = 0;
@@ -33,6 +34,17 @@ fn main() {
                 (false, false) => MOVE_LUNGE,
             }                
         };
+
+        // Avoid making the same move twice. This has the bonus effect of
+        // burning random cycles, so that pitting the example bot against itself
+        // won't so often result in an energy-tie.
+        if next_move == last_move {
+            if e_coinflip() == 0 {
+                continue;
+            }
+        }
+
+        last_move = next_move;
 
         let r = e_move(next_move);
         assert!(r == 0);
