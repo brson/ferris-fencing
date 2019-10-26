@@ -8,7 +8,7 @@ other on a [RISC-V] virtual machine.
 It is a showcase of [CKB-VM], a simple implementation of the RISC-V instruction
 set, written in the [Rust] programing language.
 
-> [www.ferrisfencing.org][fforg]
+[www.ferrisfencing.org][fforg]
 
 [fforg]: http://www.ferrisfencing.org
 [RISC-V]: https://www.riscv.org
