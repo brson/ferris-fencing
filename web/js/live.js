@@ -29,6 +29,75 @@ function clearPlayfield() {
 
 var turnLen = 100;
 
+function doEnd() {
+    clearPlayfield();
+    let match = matches[currentMatch];
+    let game = match.games[currentGame];
+
+    let end = game.end;
+    console.log(end);
+
+    let p1pos = 0;
+    let p2pos = 0;
+
+    let winner = 1;
+    if (end["P1Victory"] != null) {
+        winner = 1;
+        p1pos = end["P1Victory"].p1.pos;
+    }
+    if (end["P1Pin"] != null) {
+        winner = 1;
+        p1pos = end["P1Pin"].p1.pos;
+    }
+    if (end["P1Survive"] != null) {
+        winner = 1;
+        p1pos = end["P1Survive"].p1.pos;
+    }
+    if (end["P1Energy"] != null) {
+        winner = 1;
+        p1pos = end["P1Energy"].p1.pos;
+    }
+    if (end["P1Turns"] != null) {
+        winner = 1;
+        p1pos = end["P1Turns"].p1.pos;
+    }
+    if (end["P2Victory"] != null) {
+        winner = 2;
+        p2pos = end["P2Victory"].p2.pos;
+    }
+    if (end["P2Pin"] != null) {
+        winner = 2;
+        p2pos = end["P2Pin"].p2.pos;
+    }
+    if (end["P2Survive"] != null) {
+        winner = 2;
+        p2pos = end["P2Survive"].p2.pos;
+    }
+    if (end["P2Energy"] != null) {
+        winner = 2;
+        p2pos = end["P2Energy"].p2.pos;
+    }
+    if (end["P2Turns"] != null) {
+        winner = 2;
+        p2pos = end["P2Turns"].p2.pos;
+    }
+
+    let playfield = document.getElementById("playfield");
+    let p1div = playfield.children[p1pos];
+    let p2div = playfield.children[p2pos];
+
+    if (winner == 1) {
+        p1div.innerHTML = '<img src="images/ferris-fencing-victor-gold.svg">';
+    }
+
+    if (winner == 2) {
+        p2div.innerHTML = '<img src="images/ferris-fencing-victor-blue.svg">';
+    }
+
+    currentTurn = 0;
+    window.setTimeout(doTurn, turnLen * 4);
+}
+
 function doTurn() {
     console.log("turn");
     if (currentTurn < maxTurns) {
@@ -60,12 +129,11 @@ function doTurn() {
         p2ediv.style["width"] = p2eps;
         
         currentTurn += 1;
-        console.log("set timeout");
         window.setTimeout(doTurn, turnLen);
     } else {
         doEnd();
-        currentTurn = 0;
-        window.setTimeout(doTurn, turnLen);
+        /*currentTurn = 0;
+        window.setTimeout(doTurn, turnLen);*/
     }
 }
 

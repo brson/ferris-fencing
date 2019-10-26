@@ -104,7 +104,9 @@ body {
 }
 
 img {
+    max-height: 100px;
     width: 100%;
+    max-width: 100px;
 }
 
 #energybox {
@@ -175,4 +177,8 @@ img {
 #statusbox > #status-msg {
     flex-basis: 100%;
     text-align: center;
+}
+
+#statusbox {
+    display: none; /* FIXME */
 }
