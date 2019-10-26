@@ -11,6 +11,8 @@ var matchfiles = [
     "example-matches/ex-10.json"
 ];
 
+var turnLen = 500;
+
 var matches = [];
 var loaded = 0;
 
@@ -27,10 +29,7 @@ function clearPlayfield() {
     }
 }
 
-var turnLen = 1000;
-
 function doEnd() {
-    clearPlayfield();
     let match = matches[currentMatch];
     let game = match.games[currentGame];
 
@@ -86,6 +85,7 @@ function doEnd() {
     let p1div = playfield.children[p1pos];
     let p2div = playfield.children[p2pos];
 
+    clearPlayfield();
     if (winner == 1) {
         p1div.innerHTML = '<img src="images/ferris-fencing-victor-gold.svg">';
     }
@@ -95,7 +95,21 @@ function doEnd() {
     }
 
     currentTurn = 0;
-    window.setTimeout(doTurn, turnLen * 4);
+
+    currentGame += 1;
+    console.log("games " + match.games.length);
+    if (currentGame >= match.games.length) {
+        console.log("next match");
+        currentGame = 0;
+        currentMatch += 1;
+        console.log("matches " + matches.length);
+        if (currentMatch >= matches.length) {
+            console.log("first match");
+            currentMatch = 0;
+        }
+    }
+
+    window.setTimeout(runCurrent, turnLen * 4);
 }
 
 function doTurn() {

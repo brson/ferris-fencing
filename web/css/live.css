@@ -89,6 +89,10 @@ body {
     border-bottom: 4px solid var(--ff-color);
 }
 
+#playfield {
+    border-top: 1px solid var(--wall-color);
+}
+
 #playfield > div {
     border-left: 2px solid var(--wall-color);
     border-right: 2px solid var(--wall-color);
@@ -101,6 +105,13 @@ body {
 
 #playfield > div:last-child {
     border-right: 4px solid var(--wall-color);
+}
+
+#playfield > div {
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 img {
