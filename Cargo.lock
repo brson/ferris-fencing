@@ -303,6 +303,7 @@ dependencies = [
  "bytes",
  "ckb-vm",
  "log",
+ "rand",
  "serde",
  "serde_derive",
 ]

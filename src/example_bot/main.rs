@@ -1,7 +1,7 @@
 #![allow(unused)]
 #![no_std]
 
-use ckb_vm_syscall::{ecall4, ecall1};
+use ckb_vm_syscall::{ecall4, ecall1, ecall0};
 
 fn main() {
     ckb_vm_glue::init();
@@ -22,15 +22,26 @@ fn main() {
 
         assert!(other_pos - my_pos > 0);
         let sep = other_pos - my_pos - 1;
-        let next_move = MOVE_FORWARD;
+        let next_move = if sep > 4 {
+            MOVE_FORWARD
+        } else {
+            let dec = (e_coinflip() == 0, e_coinflip() == 0);
+            match dec {
+                (true, true) => MOVE_BACK,
+                (true, false) => MOVE_STAND,
+                (false, true) => MOVE_FORWARD,
+                (false, false) => MOVE_LUNGE,
+            }                
+        };
 
         let r = e_move(next_move);
         assert!(r == 0);
     }
 }
 
-const ECALL_STATE: usize = 0x0100;
-const ECALL_MOVE: usize =  0x0101;
+const ECALL_STATE: usize    = 0x0100;
+const ECALL_MOVE: usize     = 0x0101;
+const ECALL_COINFLIP: usize = 0x0102;
 
 fn e_state(p1_pos: &mut i32, p2_pos: &mut i32,
            p1_energy: &mut i32, p2_energy: &mut i32) -> i32 {
@@ -47,6 +58,12 @@ fn e_state(p1_pos: &mut i32, p2_pos: &mut i32,
 fn e_move(kind: i32) -> i32 {
     let kind = kind as usize;
     let r = unsafe { ecall1(ECALL_MOVE, kind) };
+
+    r as _
+}
+
+fn e_coinflip() -> i32 {
+    let r = unsafe { ecall0(ECALL_COINFLIP) };
 
     r as _
 }

@@ -23,6 +23,7 @@ use crate::game::{GAMES_PER_MATCH, P1_START_POS, P2_START_POS, START_ENERGY, GAM
 use ckb_vm::registers::*;
 use std::convert::TryFrom;
 use std::mem;
+use rand::Rng;
 
 pub mod game;
 mod transition;
@@ -221,12 +222,11 @@ impl Syscalls<GameCoreMachine> for GameSyscalls {
         match num as u32 {
             ECALL_STATE => {
                 ecall4(machine, |m, pa_pos_ptr, pb_pos_ptr, pa_energy_ptr, pb_energy_ptr| {
-                    let r = e_state(m,
-                                    &mut game_state,
-                                    self.player,
-                                    pa_pos_ptr, pb_pos_ptr,
-                                    pa_energy_ptr, pb_energy_ptr);
-                    r
+                    e_state(m,
+                            &mut game_state,
+                            self.player,
+                            pa_pos_ptr, pb_pos_ptr,
+                            pa_energy_ptr, pb_energy_ptr)
                 });
                 Ok(true)
             },
@@ -236,6 +236,14 @@ impl Syscalls<GameCoreMachine> for GameSyscalls {
                            &mut game_state,
                            self.player,
                            move_kind)
+                });
+                Ok(true)
+            },
+            ECALL_COINFLIP => {
+                ecall0(machine, |m| {
+                    e_coinflip(m,
+                               &mut game_state,
+                               self.player)
                 });
                 Ok(true)
             },
@@ -263,8 +271,16 @@ fn ecall1<F>(m: &mut GameCoreMachine, mut f: F)
     m.set_register(A0, r);
 }
 
-const ECALL_STATE: u32 = 0x0100;
-const ECALL_MOVE: u32 =  0x0101;
+fn ecall0<F>(m: &mut GameCoreMachine, mut f: F)
+    where F: FnMut(&mut GameCoreMachine) -> u32
+{
+    let r = f(m);
+    m.set_register(A0, r);
+}
+
+const ECALL_STATE: u32    = 0x0100;
+const ECALL_MOVE: u32     = 0x0101;
+const ECALL_COINFLIP: u32 = 0x0102;
 
 type MWord = u32;
 
@@ -356,6 +372,14 @@ fn e_move(machine: &mut GameCoreMachine,
 
     0
 }           
+
+fn e_coinflip(machine: &mut GameCoreMachine,
+              game_state: &mut GameState,
+              player: Player) -> MWord {
+    let mut rng = rand::thread_rng();
+    let flip: bool = rng.gen();
+    if flip { 0 } else { 1 }
+}
 
 type GameCoreMachine = DefaultCoreMachine<u32, WXorXMemory<u32, SparseMemory<u32>>>;
 type GameMachine<'a> = DefaultMachine<'a, GameCoreMachine>;
