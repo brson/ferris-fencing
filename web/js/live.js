@@ -27,7 +27,7 @@ function clearPlayfield() {
     }
 }
 
-var turnLen = 100;
+var turnLen = 1000;
 
 function doEnd() {
     clearPlayfield();
