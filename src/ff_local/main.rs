@@ -16,6 +16,8 @@ use itertools::Itertools;
 
 #[derive(StructOpt)]
 struct Opts {
+    #[structopt(short, long)]
+    silent: bool,
     p1exe: PathBuf,
     p2exe: PathBuf,
 }
@@ -36,7 +38,13 @@ fn run() -> BResult<()> {
 
     let match_res = ff_rt::run_match(&p1exe, &p2exe)?;
 
-    print_match_results(&match_res);
+    if opts.silent {
+        for (i, game) in match_res.games.iter().enumerate() {
+           println!("{} ({})", game.end.winner(), game.end.explain());
+        }
+    } else {
+        print_match_results(&match_res);
+    }
 
     Ok(())
 }
