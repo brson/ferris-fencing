@@ -9,7 +9,7 @@ path = "main.rs"
 
 [dependencies]
 ff_web_common = { path = "../ff_web_common" }
-hyper = "0.12.35"
+hyper = "0.14.12"
 http = "0.1.19"
 tokio = "0.1.22"
 futures = "0.1.29"
